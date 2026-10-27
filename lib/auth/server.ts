@@ -80,3 +80,18 @@ export function withDevice<C>(handler: (req: Request, ctx: C) => Promise<Respons
     }
   };
 }
+
+// Routes d'écriture : jeton valide et profil connu (en-tête X-Profile).
+export function withProfile<C>(handler: (req: Request, ctx: C, profile: Profile) => Promise<Response>) {
+  return withDevice<C>(async (req, ctx) => {
+    const profile = requestProfile(req);
+    if (!profile) return json({ error: "profile" }, 400);
+    return handler(req, ctx, profile);
+  });
+}
+
+export async function readJson(req: Request): Promise<unknown> {
+  return req.json().catch(() => null);
+}
+
+export const isObjectId = (id: string) => /^[0-9a-f]{24}$/i.test(id);

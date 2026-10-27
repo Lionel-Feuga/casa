@@ -12,10 +12,14 @@
     "seed": "tsx --env-file=.env.local scripts/seed.ts"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@serwist/next": "^9.5.13",
     "@tanstack/react-query": "^5.105.0",
     "ably": "^2.30.0",
     "bcryptjs": "^3.0.3",
+    "fractional-indexing": "^4.0.0",
     "lucide-react": "^1.62.0",
     "mongodb": "^7.7.0",
     "next": "^16.4.3",
