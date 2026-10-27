@@ -1,0 +1,218 @@
+/* ============ Budgets (section 6) ============ */
+.mnav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -10px;
+}
+.mnav button {
+  all: unset;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.mnav button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.mnav button:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 0;
+}
+.mnav .meta {
+  opacity: 0.85;
+  font-weight: 700;
+}
+.btot {
+  padding: 14px 16px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--tl);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.btot .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+.btot b {
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 38px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.btot .row span {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+.btot .btn {
+  align-self: flex-start;
+  margin-top: 6px;
+  min-height: 42px;
+  font-size: 14px;
+}
+.bar {
+  height: 14px;
+  border: var(--line) solid var(--ink);
+  border-radius: 9px;
+  background: var(--soft);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--tl);
+  border-right: var(--line) solid var(--ink);
+}
+.bar i[data-empty] {
+  border-right: 0;
+}
+.bar.over i {
+  background: repeating-linear-gradient(-45deg, var(--pk) 0 6px, color-mix(in srgb, var(--pk) 55%, #fff) 6px 12px);
+  border-right: 0;
+}
+.bc {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 11px 12px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r);
+}
+.bc:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.bc:active {
+  translate: 2px 2px;
+}
+.bc .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bc .row b {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+}
+.bc .row span {
+  font-size: 13.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bc .row em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--soft);
+  white-space: nowrap;
+}
+.bc .eico {
+  width: 32px;
+  height: 32px;
+}
+.bc small {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+.over-note {
+  font-size: 12px;
+  font-weight: 800;
+  align-self: flex-start;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--pk);
+  color: var(--on);
+}
+.blist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.blist li:nth-child(2n) .eico {
+  background: var(--tl);
+  color: var(--ontl);
+}
+.fab.light {
+  background: var(--tl);
+  color: var(--ontl);
+  border: var(--line) solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* Gestion des plafonds */
+.lrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 10px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r);
+}
+.lrow b {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+}
+.lrow label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+}
+.lrow input {
+  all: unset;
+  box-sizing: border-box;
+  width: 110px;
+  min-height: 42px;
+  padding: 6px 10px;
+  text-align: right;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: var(--soft);
+}
+.lrow input:focus {
+  border-color: var(--pk);
+  background: var(--wh);
+}
+.lrow input::placeholder {
+  font-weight: 700;
+  font-size: 12.5px;
+  color: var(--ink);
+  opacity: 0.55;
+}
+.lrow .saved {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.6;
+  min-width: 14px;
+}

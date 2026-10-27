@@ -98,3 +98,14 @@ export async function expenses(): Promise<Collection<ExpenseDoc>> {
 export async function settlements(): Promise<Collection<SettlementDoc>> {
   return (await getDb()).collection<SettlementDoc>("settlements");
 }
+
+export interface BudgetDoc {
+  _id?: ObjectId;
+  categoryId: ObjectId;
+  view: "shared" | Profile;
+  monthlyLimitCents: number | null;
+}
+
+export async function budgets(): Promise<Collection<BudgetDoc>> {
+  return (await getDb()).collection<BudgetDoc>("budgets");
+}

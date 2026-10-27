@@ -53,6 +53,7 @@ export function useMoneyActions() {
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: ["expenses"] });
     void qc.invalidateQueries({ queryKey: ["settlements"] });
+    void qc.invalidateQueries({ queryKey: ["budgets"] });
   };
 
   const saveExpense = useMutation({

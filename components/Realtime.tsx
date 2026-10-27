@@ -20,10 +20,11 @@ export const useRealtime = () => useContext(RealtimeContext);
 
 const POLL_MS = 15_000;
 
-// Données à recharger selon ce qui a changé : le solde dépend des règlements, les dépenses des catégories.
+// Données à recharger selon ce qui a changé : le solde dépend des règlements, les budgets des dépenses.
 const RELATED: Partial<Record<ChangeMessage["type"], string[]>> = {
+  expenses: ["expenses", "budgets"],
   settlements: ["settlements", "expenses"],
-  categories: ["categories", "expenses"],
+  categories: ["categories", "expenses", "budgets"],
 };
 
 export function RealtimeProvider({ profile, children }: { profile: Profile; children: React.ReactNode }) {
