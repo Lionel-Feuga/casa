@@ -1,0 +1,651 @@
+@import "../styles/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--y);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--y);
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 3px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fondu court des couleurs au changement de thème */
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after {
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s,
+    text-shadow 0.2s,
+    fill 0.2s !important;
+}
+
+/* ============ Colonne de l'appli (480 px max sur grand écran) ============ */
+.app {
+  position: relative;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  isolation: isolate;
+  overflow-x: clip;
+  padding-top: env(safe-area-inset-top);
+}
+
+.deco {
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+  top: -40px;
+  right: -50px;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pk) 28%, transparent 31%) 0 0 / 11px 11px;
+  opacity: 0.55;
+}
+
+.ic {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--sw);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* ============ En-tête d'écran ============ */
+.top {
+  padding: 10px 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hello {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+.ttl {
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1;
+  text-shadow: 3px 3px 0 var(--pk);
+}
+.meta {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.presence i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--pk);
+  animation: live 1.8s ease-in-out infinite;
+}
+@keyframes live {
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+}
+.avatar {
+  all: unset;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-right: -7px;
+}
+.avatar span {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  border: var(--line) solid var(--ink);
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+.avatar:active span {
+  transform: scale(0.92);
+}
+.avatar:focus-visible span {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.bg-L {
+  background: var(--bl);
+}
+.bg-J {
+  background: var(--pk);
+  color: var(--on) !important;
+}
+
+/* ============ Contenu défilant ============ */
+.content {
+  padding: 4px 16px calc(150px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 14px 16px;
+}
+
+.tape {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transform: rotate(-2deg);
+  box-shadow: 2px 2px 0 var(--ink);
+  background: var(--ink);
+}
+
+.soon {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.soon b {
+  font-size: 16px;
+  font-weight: 800;
+}
+.soon p {
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+/* ============ Barre d'onglets ============ */
+.tabs {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-around;
+  gap: 2px;
+  padding: 8px 8px calc(10px + env(safe-area-inset-bottom));
+  background: var(--wh);
+  border-top: var(--line) solid var(--ink);
+}
+.tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 2px;
+  white-space: nowrap;
+  text-decoration: none;
+  color: var(--ink);
+  border: 2px solid transparent;
+  border-radius: 12px;
+}
+.tab .ic {
+  width: 22px;
+  height: 22px;
+}
+.tab.on {
+  background: var(--pk);
+  color: var(--on);
+  border-color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+/* ============ Boutons ============ */
+.btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 11px 14px;
+  text-align: center;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-lg);
+  background: var(--wh);
+  font-weight: 800;
+  font-size: 15px;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.btn.go {
+  background: var(--pk);
+  color: var(--on);
+  font-family: var(--f-disp);
+  font-weight: 400;
+}
+
+/* ============ Feuille du bas ============ */
+.dim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(10, 10, 30, 0.55);
+  animation: fade-in 0.18s ease-out both;
+}
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 480px;
+  z-index: 41;
+  transform: translateX(-50%);
+  background: var(--y);
+  color: var(--ink);
+  border: var(--line) solid var(--ink);
+  border-bottom: 0;
+  border-radius: 26px 26px 0 0;
+  padding: 12px 16px calc(22px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: sheet-up 0.22s cubic-bezier(0.3, 1.2, 0.5, 1) both;
+}
+.sheet::before {
+  content: "";
+  align-self: center;
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ink);
+  opacity: 0.3;
+}
+.sheet h3 {
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.1;
+}
+.sheet .note {
+  font-size: 13px;
+  opacity: 0.75;
+}
+@keyframes sheet-up {
+  from {
+    transform: translate(-50%, 100%);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.menu .btn {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.menu .btn small {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+/* Vignettes de thème */
+.tgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.tile {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  position: relative;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r);
+  background: var(--wh);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.15;
+}
+.tile:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.tile .mini {
+  width: 48px;
+  height: 32px;
+  border-radius: 7px;
+  border: 2px solid var(--ink);
+  position: relative;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.tile .mini b {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 20px;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+.tile .mini i {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+}
+.tile[aria-pressed="true"] {
+  box-shadow: 3px 3px 0 var(--pk);
+  background: var(--soft);
+}
+.tile .tick {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--pk);
+  color: var(--on);
+  border: 2px solid var(--ink);
+  display: grid;
+  place-items: center;
+}
+.tile .tick .ic {
+  width: 13px;
+  height: 13px;
+  stroke-width: 3.2;
+}
+
+/* ============ Écran du code ============ */
+.code {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 22px calc(26px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+.code .ttl {
+  font-size: 38px;
+  margin-top: 24px;
+}
+.code p {
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 30ch;
+}
+.dots {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 2px;
+}
+.dots i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: var(--line) solid var(--ink);
+  background: var(--wh);
+}
+.dots i.f {
+  background: var(--pk);
+  animation: stamp 0.3s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.dots.shake {
+  animation: shake 0.4s;
+}
+@keyframes stamp {
+  0% {
+    transform: scale(0.5) rotate(0);
+  }
+  100% {
+    transform: scale(1) rotate(-10deg);
+  }
+}
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+  40%,
+  80% {
+    transform: translateX(8px);
+  }
+}
+.code .msg {
+  min-height: 22px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.code .msg.err {
+  color: var(--ink);
+  background: var(--wh);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 2px 10px;
+  box-shadow: 2px 2px 0 var(--pk);
+  transform: rotate(-1.5deg);
+}
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin-top: auto;
+}
+.key {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  height: 60px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-lg);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--f-disp);
+  font-size: 26px;
+  user-select: none;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+.key:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.key:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.key.k {
+  background: var(--ink);
+  color: var(--y);
+  font-family: var(--f-ui);
+  font-size: 14px;
+  font-weight: 800;
+}
+.key:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ============ Choix du profil ============ */
+.prof {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px 22px calc(40px + env(safe-area-inset-bottom));
+}
+.prof .ttl {
+  font-size: 48px;
+}
+.prof p {
+  font-size: 16px;
+}
+.pc {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 5px 5px 0 var(--ink);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.pc.j {
+  box-shadow: 5px 5px 0 var(--pk);
+  transform: rotate(-1.5deg);
+}
+.pc:active {
+  transform: translate(5px, 5px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.pc:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 3px;
+}
+.pc .big {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-disp);
+  font-size: 28px;
+  color: #fff;
+  border: var(--line) solid var(--ink);
+}
+.pc b {
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 30px;
+}
+.pfoot {
+  font-size: 13px !important;
+  opacity: 0.75;
+}
+
+.boot {
+  min-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

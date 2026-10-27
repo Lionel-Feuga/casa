@@ -1,0 +1,73 @@
+/* Tokens de la DA Marché pop. Un thème ne redéfinit que les couleurs (section 9). */
+:root,
+[data-theme="original"] {
+  --y: #ffe14d;
+  --ink: #1b1b3a;
+  --pk: #ff4f8b;
+  --tl: #00a79f;
+  --bl: #3d5afe;
+  --soft: #fff6bf;
+  --on: #ffffff;
+  --ontl: #ffffff;
+}
+[data-theme="piscine"] {
+  --y: #5cc8ff;
+  --ink: #0b1e3f;
+  --pk: #ff5da2;
+  --tl: #ffc93c;
+  --bl: #1b3bd1;
+  --soft: #e3f5ff;
+  --on: #ffffff;
+  --ontl: #0b1e3f;
+}
+[data-theme="pistache"] {
+  --y: #c6e77a;
+  --ink: #1d2a10;
+  --pk: #e8336d;
+  --tl: #6a4bdb;
+  --bl: #2546e0;
+  --soft: #f3fadb;
+  --on: #ffffff;
+  --ontl: #ffffff;
+}
+[data-theme="lagon"] {
+  --y: #2ec4b6;
+  --ink: #0e2233;
+  --pk: #ff9f1c;
+  --tl: #ffe14d;
+  --bl: #2340d9;
+  --soft: #e2f8f5;
+  --on: #0e2233;
+  --ontl: #0e2233;
+}
+[data-theme="cerise"] {
+  --y: #ff8fb3;
+  --ink: #2a0f2a;
+  --pk: #ffe14d;
+  --tl: #00a79f;
+  --bl: #2340d9;
+  --soft: #ffe8f0;
+  --on: #2a0f2a;
+  --ontl: #ffffff;
+}
+[data-theme="agrume"] {
+  --y: #ffa62b;
+  --ink: #241300;
+  --pk: #2e5bff;
+  --tl: #2bb673;
+  --bl: #7a1fa2;
+  --soft: #fff0dc;
+  --on: #ffffff;
+  --ontl: #ffffff;
+}
+
+:root {
+  --wh: #ffffff;
+  --line: 2.5px;
+  --r: 12px;
+  --r-lg: 14px;
+  --sw: 2.6;
+  --f-ui: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-disp: var(--font-bagel), var(--font-figtree), sans-serif;
+  --tabbar-h: 64px;
+}

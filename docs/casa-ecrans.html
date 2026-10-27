@@ -1,0 +1,468 @@
+<title>Casa, écrans Marché pop</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout : planche d'écrans. Intro, puis une grille de téléphones, chacun suivi de ses points à valider. */
+:root{
+  --bg:#F6F4EE; --fg:#1B1B3A; --muted:#5C5A70; --line:#DEDACF; --card:#FFFFFF; --chip:#ECE8DC; --focus:#3D5AFE; --pkt:#D6286A;
+  --f-ui:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif; --f-disp:'Bagel Fat One','Figtree',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#13132A; --fg:#F1EFF8; --muted:#A9A7C2; --line:#2C2C4A; --card:#1C1C38; --chip:#25254A; --focus:#8EA2FF; --pkt:#FF7FAA; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#13132A; --fg:#F1EFF8; --muted:#A9A7C2; --line:#2C2C4A; --card:#1C1C38; --chip:#25254A; --focus:#8EA2FF; --pkt:#FF7FAA; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:48px}
+h1,h2{text-wrap:balance;margin:0}
+p{margin:0}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.intro{display:flex;flex-direction:column;gap:14px;max-width:70ch}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.intro h1{font-family:var(--f-disp);font-weight:400;font-size:clamp(34px,5vw,52px);line-height:1.05;text-shadow:3px 3px 0 #FF4F8B}
+.intro p{color:var(--muted);font-size:17px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:48px 28px;justify-items:center}
+figure{margin:0;display:flex;flex-direction:column;gap:14px;width:300px;max-width:100%}
+figcaption{display:flex;flex-direction:column;gap:8px}
+figcaption h2{font-size:18px;font-weight:800;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+figcaption h2 small{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.notes{margin:0;padding:12px 14px 12px 30px;background:var(--card);border:1px solid var(--line);border-radius:12px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.notes li::marker{color:var(--pkt)}
+.notes b{font-weight:700}
+.legend{font-size:14px;color:var(--muted)}
+
+/* ================= Téléphone ================= */
+.phone{--y:#FFE14D;--ink:#1B1B3A;--pk:#FF4F8B;--tl:#00A79F;--bl:#3D5AFE;--wh:#FFFFFF;--soft:#FFF6BF;
+  width:300px;max-width:100%;height:620px;border-radius:46px;padding:9px;background:#0F0E13;box-shadow:0 24px 50px -20px rgba(20,10,40,.45),inset 0 0 0 2px #2A2833;flex:none}
+.screen{position:relative;height:100%;border-radius:38px;overflow:hidden;display:flex;flex-direction:column;isolation:isolate;background:var(--y);color:var(--ink);font-family:var(--f-ui);--sw:2.6}
+.screen::before{content:"";position:absolute;top:10px;left:50%;width:84px;height:24px;margin-left:-42px;border-radius:20px;background:#0F0E13;z-index:5}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 4px;font-size:13px;font-weight:700;position:relative;z-index:2}
+.sb .bat{width:22px;height:11px;border-radius:3px;border:1.6px solid currentColor;position:relative}
+.sb .bat::after{content:"";position:absolute;inset:1.5px 5px 1.5px 1.5px;background:currentColor;border-radius:1px}
+.deco{position:absolute;pointer-events:none;z-index:0;top:-40px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,var(--pk) 28%,transparent 31%) 0 0/11px 11px;opacity:.55}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:var(--sw);stroke-linecap:round;stroke-linejoin:round;flex:none}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;position:relative;z-index:1}
+.top{padding:6px 20px 10px;display:flex;flex-direction:column;gap:4px}
+.hello{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px}
+.presence{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.presence i{width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--pk);animation:live 1.8s ease-in-out infinite}
+@keyframes live{50%{transform:scale(1.5);opacity:.5}}
+.avatar{width:30px;height:30px;display:grid;place-items:center;font-weight:800;font-size:13px;background:var(--bl);color:#fff;border:2.5px solid var(--ink);border-radius:50%}
+.ttl{font-family:var(--f-disp);font-weight:400;font-size:40px;line-height:1;text-shadow:3px 3px 0 var(--pk);margin:0}
+.meta{font-size:13px;font-weight:600;opacity:.75}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:4px 16px 150px;display:flex;flex-direction:column;gap:7px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.card{background:#fff;border:2.5px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink)}
+.add{margin:2px 16px 8px;display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:14px;font-weight:600;background:#fff;border:2.5px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink)}
+.add span{opacity:.6}
+.tape{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px 4px 8px;border-radius:6px;color:#fff;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;transform:rotate(-2deg);box-shadow:2px 2px 0 var(--ink)}
+.tape:nth-of-type(odd){transform:rotate(1.5deg)}
+.tape .ic{width:16px;height:16px}
+.c-tl{background:var(--tl)}.c-bl{background:var(--bl)}.c-pk{background:var(--pk)}.c-ink{background:var(--ink)}
+.it{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 11px;position:relative;font-size:14.5px;background:#fff;border:2.5px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);transition:transform .15s,box-shadow .15s}
+.it:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.it:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.it.done{background:var(--soft)}
+.it .nm{position:relative;font-weight:700;flex:1;min-width:0;display:flex;flex-direction:column}
+.it .nm small{font-size:11.5px;font-weight:600;opacity:.65}
+.it .qt{font-size:12.5px;font-weight:600;opacity:.6;white-space:nowrap}
+.box{width:24px;height:24px;display:grid;place-items:center;flex:none;border:2.5px solid var(--ink);border-radius:7px;background:#fff}
+.box .ic{width:15px;height:15px;opacity:0;stroke-width:3.2}
+.done .box{background:var(--pk);color:#fff;animation:stamp .35s cubic-bezier(.3,1.6,.5,1) both}
+.done .box .ic{opacity:1}
+@keyframes stamp{0%{transform:scale(.5) rotate(0)}100%{transform:scale(1) rotate(-10deg)}}
+.strike{position:absolute;left:-2px;top:9px;height:4px;width:0;border-radius:3px;background:var(--pk);transform:rotate(-2deg);transition:width .35s cubic-bezier(.6,0,.3,1)}
+.done .strike{width:calc(100% + 4px)}
+.who{height:22px;min-width:22px;padding:0 4px;display:grid;place-items:center;font-size:10.5px;font-weight:800;flex:none;border-radius:11px;border:2px solid var(--ink);color:#fff}
+.w-L{background:var(--bl)}.w-J{background:var(--pk)}.w-LJ{background:linear-gradient(90deg,var(--bl) 50%,var(--pk) 50%)}
+.fab{position:absolute;right:14px;bottom:78px;z-index:4;display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--ink);color:var(--y);border-radius:999px;box-shadow:4px 4px 0 var(--pk);font-family:var(--f-disp);font-size:15px}
+.tabs{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;justify-content:space-around;padding:8px 8px 18px;background:#fff;border-top:2.5px solid var(--ink)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:5px 2px;min-width:0;white-space:nowrap;border:2px solid transparent}
+.tab .ic{width:21px;height:21px}
+.tab.on{background:var(--pk);color:#fff;border-radius:12px;border-color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:5px 11px;border:2px solid var(--ink);border-radius:999px;font-size:12.5px;font-weight:800;background:#fff}
+.chip.on{background:var(--ink);color:var(--y)}
+
+/* Profil */
+.prof{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:0 22px 40px;position:relative;z-index:1}
+.prof .ttl{font-size:44px;white-space:nowrap}
+.prof p{font-size:15px;font-weight:600}
+.pc{display:flex;align-items:center;gap:16px;padding:16px;background:#fff;border:2.5px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--ink)}
+.pc:nth-of-type(2){box-shadow:5px 5px 0 var(--pk);transform:rotate(-1.5deg)}
+.pc .big{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-disp);font-size:28px;color:#fff;border:2.5px solid var(--ink)}
+.pc b{font-family:var(--f-disp);font-weight:400;font-size:28px}
+.pfoot{font-size:12.5px!important;opacity:.75}
+
+/* Magasin */
+.store{background:var(--ink);color:var(--y)}
+.store .sb{color:#fff}
+.stop{display:flex;align-items:center;gap:10px;padding:6px 18px 12px}
+.sx{width:38px;height:38px;display:grid;place-items:center;background:var(--y);color:var(--ink);border-radius:50%;flex:none}
+.slabel{font-family:var(--f-disp);font-size:18px;color:#fff;flex:1;white-space:nowrap}
+.sleft{background:var(--pk);color:#fff;padding:4px 10px;border-radius:8px;transform:rotate(3deg);font-size:13px;font-weight:800;white-space:nowrap}
+.prog{margin:0 18px 10px;height:8px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.15)}
+.prog i{display:block;height:100%;width:22%;border-radius:8px;background:var(--y);transition:width .4s}
+.rayon{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--pk)}
+.sit{all:unset;cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px;font-size:21px;line-height:1.15;position:relative;background:#26264A;border-radius:14px;color:#fff;font-weight:800;border:2px solid rgba(255,225,77,.25)}
+.sit:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sit .box{width:38px;height:38px;border:3px solid var(--y);border-radius:10px;background:transparent}
+.sit .box .ic{width:22px;height:22px}
+.sit.done{opacity:.45}
+.sit.done .box{background:var(--pk);border-color:var(--pk)}
+.sit .nm{position:relative;flex:1;min-width:0}
+.sit .strike{top:11px}
+.sit .qt{display:block;font-size:13px;font-weight:700;opacity:.7;margin-top:2px}
+.live{display:inline-block;font-size:11px;font-weight:800;padding:2px 7px;margin-top:5px;background:var(--tl);color:#fff;border-radius:5px;transform:rotate(-2deg)}
+.sexit{position:absolute;left:14px;right:14px;bottom:20px;z-index:4;text-align:center;padding:15px;background:var(--y);color:var(--ink);border-radius:16px;font-family:var(--f-disp);font-size:17px;box-shadow:4px 4px 0 var(--pk)}
+
+/* Comptes */
+.bal{margin:2px 16px 10px;padding:14px 16px;display:flex;flex-direction:column;gap:3px;background:#fff;border:2.5px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--pk)}
+.bl{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.bamt{font-family:var(--f-disp);font-size:40px;line-height:1.05;text-shadow:3px 3px 0 var(--tl);font-variant-numeric:tabular-nums}
+.bwho{font-size:15px;font-weight:700}
+.bcalc{font-size:12px;font-weight:600;opacity:.8;font-variant-numeric:tabular-nums}
+.bact{display:flex;gap:8px;margin-top:8px}
+.bact span{flex:1;text-align:center;padding:8px;font-size:13.5px;font-weight:800;border:2.5px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink)}
+.bact span:first-child{background:var(--y)}.bact span:last-child{background:var(--tl);color:#fff}
+.split{margin:0 16px 10px;display:flex;flex-direction:column;gap:6px}
+.sbar{display:flex;height:30px;font-size:12px;font-weight:800;overflow:hidden;border:2.5px solid var(--ink);border-radius:10px;color:#fff}
+.sbar span{display:flex;align-items:center;padding:0 10px;white-space:nowrap}
+.sbar span:first-child{width:60%;background:var(--bl);border-right:2.5px solid var(--ink)}
+.sbar span:last-child{flex:1;justify-content:flex-end;background:var(--pk)}
+.slab{font-size:12px;font-weight:700;opacity:.7}
+.h4{margin:0 20px 6px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.75}
+.er{display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fff;border:2.5px solid var(--ink);border-radius:12px}
+.eico{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;border:2px solid var(--ink);background:var(--y)}
+.er:nth-child(2n) .eico{background:var(--tl);color:#fff}
+.et{flex:1;min-width:0;display:flex;flex-direction:column}
+.et b{font-size:14px}
+.et small{font-size:11.5px;font-weight:600;opacity:.7}
+.ea{text-align:right;display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.ea b{font-size:14px}
+.ea small{font-size:11px;font-weight:700;opacity:.7}
+
+/* Nouvelle dépense */
+.form{flex:1;min-height:0;overflow-y:auto;padding:0 16px 110px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
+.form::-webkit-scrollbar{display:none}
+.fhead{display:flex;align-items:center;justify-content:space-between;padding:6px 18px 8px}
+.fhead h3{font-family:var(--f-disp);font-weight:400;font-size:24px;margin:0}
+.fhead .sx{width:34px;height:34px;background:#fff;border:2.5px solid var(--ink)}
+.amt{text-align:center;padding:14px 10px 10px;background:#fff;border:2.5px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--pk)}
+.amt b{font-family:var(--f-disp);font-weight:400;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.amt b::after{content:"";display:inline-block;width:3px;height:36px;background:var(--pk);margin-left:3px;vertical-align:-4px;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.field{display:flex;flex-direction:column;gap:5px}
+.field > span{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.inp{background:#fff;border:2.5px solid var(--ink);border-radius:12px;padding:9px 12px;font-weight:700;font-size:14.5px}
+.seg{display:flex;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
+.seg span{flex:1;text-align:center;padding:9px;font-weight:800;font-size:14px}
+.seg span+span{border-left:2.5px solid var(--ink)}
+.seg .on{background:var(--bl);color:#fff}
+.calc{font-size:12.5px;font-weight:700;padding:9px 12px;border-radius:12px;border:2px dashed var(--ink);background:rgba(255,255,255,.5);font-variant-numeric:tabular-nums}
+.save{position:absolute;left:16px;right:16px;bottom:22px;z-index:4;text-align:center;padding:14px;background:var(--pk);color:#fff;border:2.5px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--ink);font-family:var(--f-disp);font-size:17px}
+
+/* Budgets */
+.btot{margin:2px 16px 10px;padding:14px 16px;background:#fff;border:2.5px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--tl);display:flex;flex-direction:column;gap:6px}
+.btot .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.btot b{font-family:var(--f-disp);font-weight:400;font-size:38px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.btot .row span{font-size:14px;font-weight:700;opacity:.8}
+.bar{height:16px;border:2.5px solid var(--ink);border-radius:9px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;border-right:2.5px solid var(--ink);background:var(--tl)}
+.bar.over i{background:repeating-linear-gradient(-45deg,var(--pk) 0 6px,#FF7FAA 6px 12px);border-right:0}
+.bc{display:flex;flex-direction:column;gap:7px;padding:11px 12px;background:#fff;border:2.5px solid var(--ink);border-radius:12px}
+.bc .row{display:flex;align-items:center;gap:10px}
+.bc .row b{flex:1;font-size:14.5px}
+.bc .row span{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.bc .bar{height:12px}
+.bc .eico{width:30px;height:30px}
+.over-note{font-size:11.5px;font-weight:800;color:#C0145A}
+
+/* À payer */
+.due{display:flex;align-items:center;gap:10px;padding:9px 11px;background:#fff;border:2.5px solid var(--ink);border-radius:12px}
+.date{width:42px;flex:none;text-align:center;border:2.5px solid var(--ink);border-radius:9px;overflow:hidden;background:#fff;box-shadow:2px 2px 0 var(--ink)}
+.date i{display:block;font-style:normal;font-size:9.5px;font-weight:800;letter-spacing:.08em;background:var(--pk);color:#fff;padding:1px 0}
+.date b{display:block;font-family:var(--f-disp);font-weight:400;font-size:19px;line-height:1.25}
+.due .et small span{display:inline-block;white-space:nowrap;padding:0 6px;border-radius:5px;background:var(--y);border:1.5px solid var(--ink);font-size:10.5px;font-weight:800;margin-right:4px}
+.due .et small span.once{background:var(--tl);color:#fff}
+.pay{font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:8px;border:2px solid var(--ink);background:var(--y);margin-top:3px;align-self:flex-end}
+.due.paid{background:var(--soft);border-style:dashed}
+.due.paid .pay{background:var(--ink);color:var(--y)}
+.sum{margin:2px 16px 10px;padding:12px 16px;background:var(--ink);color:#fff;border-radius:16px;box-shadow:5px 5px 0 var(--pk);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sum span{font-size:12.5px;font-weight:700;opacity:.85}
+.sum b{font-family:var(--f-disp);font-weight:400;font-size:28px;color:var(--y);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Retours du 26/10 */
+.notes li.q{list-style:none;margin-left:-16px;padding:6px 8px;border-radius:8px;background:var(--chip);font-weight:600}
+.notes li.q::before{content:"À trancher · ";font-weight:800;color:var(--pkt)}
+.code{flex:1;display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 22px 26px;position:relative;z-index:1;text-align:center}
+.code .ttl{font-size:36px;margin-top:18px}
+.code p{font-size:14px;font-weight:600}
+.dots{display:flex;gap:9px;margin:4px 0 6px}
+.dots i{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--ink);background:#fff}
+.dots i.f{background:var(--pk);animation:stamp .3s cubic-bezier(.3,1.6,.5,1) both}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:auto}
+.pad span{display:grid;place-items:center;height:54px;background:#fff;border:2.5px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);font-family:var(--f-disp);font-size:24px}
+.pad span.e{background:transparent;border:0;box-shadow:none}
+.pad span.k{background:var(--ink);color:var(--y);font-family:var(--f-ui);font-size:13px;font-weight:800}
+.grip{width:14px;display:grid;grid-template-columns:repeat(2,4px);gap:3px 4px;flex:none;opacity:.45}
+.grip i{width:4px;height:4px;border-radius:50%;background:var(--ink)}
+.it.lift{transform:rotate(-3deg) scale(1.04);box-shadow:6px 8px 0 var(--pk);z-index:3;background:#fff}
+.it.lift .grip{opacity:1}
+.ghost{height:42px;border:2.5px dashed var(--ink);border-radius:12px;background:rgba(255,255,255,.35)}
+.lhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 16px 6px}
+.vider{white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--pk);color:#fff;font-size:12.5px;font-weight:800;box-shadow:2px 2px 0 var(--ink)}
+.add.typing{border-color:var(--pk);box-shadow:4px 4px 0 var(--pk)}
+.add.typing b{font-weight:800}
+.add.typing b::after{content:"";display:inline-block;width:2px;height:16px;background:var(--pk);margin-left:1px;vertical-align:-3px;animation:caret 1s steps(1) infinite}
+.add .ok{margin-left:auto;padding:3px 10px;border-radius:8px;background:var(--ink);color:var(--y);font-size:12px;font-weight:800;opacity:1}
+.sugg{margin:-2px 16px 8px;background:#fff;border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:4px 4px 0 var(--ink)}
+.sugg div{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:15px;font-weight:600}
+.sugg div+div{border-top:2px solid #F0EBD6}
+.sugg div:first-child{background:var(--soft)}
+.sugg u{text-decoration:none;font-weight:800;background:linear-gradient(transparent 60%,#FFB3CD 60%)}
+.sugg small{font-size:11.5px;font-weight:800;opacity:.55}
+.kbd{position:absolute;left:0;right:0;bottom:0;z-index:4;background:#D9D6CC;padding:8px 4px 22px;display:flex;flex-direction:column;gap:7px}
+.kbd div{display:flex;justify-content:center;gap:4px}
+.kbd span{flex:1;max-width:25px;height:36px;display:grid;place-items:center;background:#fff;border-radius:6px;font-size:15px;font-weight:600;box-shadow:0 1px 0 #9E9A8E;color:#1B1B3A}
+.kbd span.w{max-width:none;flex:5}
+.kbd span.s{max-width:46px;flex:1.6;background:#B9B5AA;font-size:11px;font-weight:700}
+.kbd span.ret{background:var(--pk);color:#fff}
+.dim{position:absolute;inset:0;z-index:4;background:rgba(10,10,30,.55)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:5;background:var(--y);color:var(--ink);border-top:2.5px solid var(--ink);border-radius:26px 26px 0 0;padding:12px 16px 22px;display:flex;flex-direction:column;gap:10px}
+.sheet::before{content:"";align-self:center;width:44px;height:5px;border-radius:3px;background:var(--ink);opacity:.3}
+.sheet h3{font-family:var(--f-disp);font-weight:400;font-size:24px;margin:0;line-height:1.1}
+.sheet p{font-size:13px;font-weight:600}
+.sheet .amt{padding:8px}
+.sheet .amt b{font-size:36px}
+.sheet .amt b::after{height:28px}
+.btn2{display:flex;gap:8px}
+.btn2 span{flex:1;text-align:center;padding:11px 8px;border:2.5px solid var(--ink);border-radius:14px;font-weight:800;font-size:14px;background:#fff}
+.btn2 span.go{flex:1.6;background:var(--pk);color:#fff;box-shadow:3px 3px 0 var(--ink);font-family:var(--f-disp);font-weight:400;font-size:15px}
+.seg .on.pk{background:var(--pk)}
+.seg .on.tl{background:var(--tl)}
+.chip.add2{border-style:dashed}
+.modes{margin:0 16px 10px}
+.modes .seg span{padding:8px}
+.bc .row em{font-style:normal;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;border:1.5px solid var(--ink);background:var(--soft);white-space:nowrap}
+.bc small{font-size:11.5px;font-weight:600;opacity:.7}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3.5 10h17l-1.6 9.1a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6zM8 10l3-6M16 10l-3-6"/></symbol>
+  <symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M9 17c0 1.7 2.7 3 6 3s6-1.3 6-3v-4c0-1.7-2.7-3-6-3"/></symbol>
+  <symbol id="i-pie" viewBox="0 0 24 24"><path d="M12 3v9h9a9 9 0 1 1-9-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></symbol>
+  <symbol id="i-todo" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.5l2.7 2.7L16 9.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h3"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 20C5 11 10.5 5 20 4c0 9.5-6 15-15 16z"/><path d="M5 20l8-8"/></symbol>
+  <symbol id="i-milk" viewBox="0 0 24 24"><path d="M9 3h6v3l2.5 3.5V20a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1V9.5L9 6z"/><path d="M6.5 13h11"/></symbol>
+  <symbol id="i-jar" viewBox="0 0 24 24"><rect x="6.5" y="7" width="11" height="14" rx="2.5"/><rect x="7.5" y="3" width="9" height="4" rx="1"/><path d="M6.5 12h11"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M10 21v-6h4v6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9.5L5 4h14l2 5.5"/><path d="M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M4.5 12v8.5h15V12M10 20.5V15h4v5.5"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5L4.5 14H11l-1 7.5L19.5 10H13z"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L3.5 17.5l3 3 5.7-5.7a4 4 0 0 0 5.3-5.3L15 12l-2.5-.5L12 9z"/></symbol>
+  <symbol id="i-fork" viewBox="0 0 24 24"><path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 11.5V21M17 21V3c-2.5 1.5-3.5 4-3.5 7.5 0 1.5 1 2.5 3.5 2.5"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M9 16a4.5 4.5 0 0 1 6 0"/><circle cx="12" cy="19.5" r=".8"/></symbol>
+</svg>
+
+<main class="wrap">
+  <header class="intro">
+    <span class="eyebrow">Casa · direction Marché pop</span>
+    <h1>Tous les écrans de l'appli</h1>
+    <p>Tous les écrans, mis à jour avec vos retours du 26 octobre. Les montants et les articles sont des exemples. Sous chaque écran, les règles de fonctionnement retenues. Touchez les articles et les tâches pour voir l'animation.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+(function(){
+  const ic = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+  const sb = (c='') => `<div class="sb"${c}><span>14:26</span><span class="bat"></span></div>`;
+  const tabs = on => `<nav class="tabs">${[['basket','Courses'],['coins','Comptes'],['pie','Budgets'],['todo','À faire'],['cal','À payer']].map(([i,l])=>`<span class="tab${l===on?' on':''}">${ic(i)}${l}</span>`).join('')}</nav>`;
+  const box = `<span class="box">${ic('check')}</span>`;
+  const grip = `<span class="grip" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>`;
+  const who = w => `<span class="who w-${w}">${w==='LJ'?'L+J':w}</span>`;
+  const top = (ttl, left, sub) => `<div class="top"><div class="hello">${left}<span class="avatar">L</span></div><h3 class="ttl">${ttl}</h3>${sub?`<p class="meta">${sub}</p>`:''}</div>`;
+  const presence = `<span class="presence"><i></i>Jaz est en ligne</span>`;
+  const seg = (a, b, on=0, cls='') => `<div class="seg"><span class="${on===0?'on '+cls:''}">${a}</span><span class="${on===1?'on '+cls:''}">${b}</span></div>`;
+  const cats = ['Courses','Restaurants','Sorties','Divertissements','Maison','Factures','Divers','Cadeaux'];
+
+  // Liste de courses : un seul bloc, dans l'ordre choisi à la main
+  const items = [['Tomates','J'],['Avocats','J'],['Basilic','J',1],['Yaourts grecs','L'],['Comté','J'],['Œufs','L',1],['Rigatoni','L'],['Café en grains','J'],['Liquide vaisselle','L']];
+  const row = ([n,w,d], extra='') => `<button class="it${d?' done':''}${extra}" type="button" aria-pressed="${!!d}">${grip}${box}<span class="nm">${n}<s class="strike"></s></span>${who(w)}</button>`;
+
+  const S = {};
+  S.code = `<div class="screen">${sb()}<div class="deco"></div>
+    <div class="code"><h3 class="ttl">Code de la maison</h3><p>Entre le code commun pour ouvrir Casa sur ce téléphone.</p>
+      <div class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i></div>
+      <div class="pad">${['1','2','3','4','5','6','7','8','9','','0','Effacer'].map(k=>`<span class="${k===''?'e':k==='Effacer'?'k':''}">${k}</span>`).join('')}</div></div></div>`;
+
+  S.profil = `<div class="screen">${sb()}<div class="deco"></div>
+    <div class="prof"><h3 class="ttl">C'est qui ?</h3><p>Choisis ton profil sur ce téléphone.</p>
+      <div class="pc"><span class="big" style="background:var(--bl)">L</span><b>Lionel</b></div>
+      <div class="pc"><span class="big" style="background:var(--pk)">J</span><b>Jaz</b></div>
+      <p class="pfoot">Ce choix reste en mémoire sur ce téléphone. Tu peux le changer en touchant ton avatar.</p></div></div>`;
+
+  const cl = items.slice(0,3).map(r=>row(r)).join('') + `<div class="ghost" aria-hidden="true"></div>` + row(['Café en grains','J'],' lift') + items.slice(3,7).map(r=>row(r)).join('') + row(items[8]);
+  S.courses = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('Courses', presence)}
+    <div class="add">${ic('plus')}<span>Ajouter un article…</span></div>
+    <div class="lhead"><span class="meta">9 articles · 2 cochés</span><span class="vider">${ic('basket')}Vider le panier</span></div>
+    <div class="scroll" style="padding-top:2px">${cl}</div></div><span class="fab">${ic('store')}Mode magasin</span>${tabs('Courses')}</div>`;
+
+  const keys = ['azertyuiop','qsdfghjklm'];
+  S.saisie = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('Courses', presence)}
+    <div class="add typing">${ic('plus')}<b>to</b><span class="ok">Ajouter</span></div>
+    <div class="sugg"><div><span><u>To</u>mates</span><small>25 fois</small></div><div><span><u>To</u>mates cerises</span><small>9 fois</small></div><div><span><u>To</u>fu</span><small>4 fois</small></div><div><span><u>To</u>rtillas</span><small>2 fois</small></div></div></div>
+    <div class="kbd">${keys.map(r=>`<div>${[...r].map(k=>`<span>${k}</span>`).join('')}</div>`).join('')}<div><span class="s">⇧</span>${[...'wxcvbn'].map(k=>`<span>${k}</span>`).join('')}<span class="s">⌫</span></div><div><span class="s">123</span><span class="w">espace</span><span class="s ret">OK</span></div></div></div>`;
+
+  const sl = items.map(([n,w,d]) => `<button class="sit${d?' done':''}" type="button" aria-pressed="${!!d}">${box}<span class="nm">${n}<s class="strike"></s>${n==='Liquide vaisselle'?`<br><span class="live">Ajouté par Jaz à l'instant</span>`:''}</span></button>`).join('');
+  S.magasin = `<div class="screen store">${sb()}<div class="body">
+    <div class="stop"><span class="sx">${ic('x')}</span><span class="slabel">Mode magasin</span><span class="sleft" data-left>7 restants</span></div>
+    <div class="prog"><i data-prog></i></div><div class="scroll" style="padding-bottom:110px;gap:9px">${sl}</div></div>
+    <span class="sexit">Quitter le mode magasin</span></div>`;
+
+  S.ticket = `<div class="screen store">${sb()}<div class="body">
+    <div class="stop"><span class="sx">${ic('x')}</span><span class="slabel">Mode magasin</span><span class="sleft">0 restant</span></div>
+    <div class="scroll" style="gap:9px">${items.slice(0,4).map(([n]) => `<div class="sit done">${box}<span class="nm">${n}</span></div>`).join('')}</div></div>
+    <div class="dim"></div>
+    <div class="sheet"><h3>Enregistrer le ticket ?</h3><p>Les articles cochés restent barrés dans la liste jusqu'à « Vider le panier ».</p>
+      <div class="amt"><b>62,35 €</b></div>
+      <div class="field"><span>Payé par</span>${seg('Lionel','Jaz')}</div>
+      <div class="field"><span>Pour</span>${seg('Tous les deux','Juste moi',0,'tl')}</div>
+      <p>Catégorie : Courses</p>
+      <div class="btn2"><span>Pas maintenant</span><span class="go">Enregistrer</span></div></div></div>`;
+
+  const ex = [['basket','Courses Carrefour','Lionel · 22 oct.','86,40 €','part de Jaz 34,56 €'],['bolt','Électricité','Jaz · 20 oct.','72,00 €','part de Lionel 43,20 €'],['home','Étagère','Lionel · 18 oct.','63,90 €','part de Jaz 25,56 €'],['fork','Restaurant','Lionel · 15 oct.','54,00 €','part de Jaz 21,60 €'],['wifi','Internet','Jaz · 5 oct.','29,99 €','part de Lionel 17,99 €']];
+  S.comptes = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('Comptes', '<span class="meta">Octobre</span>')}
+    <div class="bal"><p class="bl">Solde après compensation</p><p class="bamt">20,53 €</p><p class="bwho">Jaz doit à Lionel</p>
+      <p class="bcalc">81,72 € dus par Jaz − 61,19 € dus par Lionel</p><div class="bact"><span>Régler</span><span>+ Dépense</span></div></div>
+    <div class="split"><div class="sbar"><span>Lionel 60 %</span><span>Jaz 40 %</span></div><span class="slab">Répartition fixe des dépenses communes</span></div>
+    <p class="h4">Dernières dépenses communes</p>
+    <div class="scroll" style="padding-bottom:84px">${ex.map(([i,t,w,a,p])=>`<div class="er"><span class="eico">${ic(i)}</span><span class="et"><b>${t}</b><small>payé par ${w}</small></span><span class="ea"><b>${a}</b><small>${p}</small></span></div>`).join('')}</div></div>${tabs('Comptes')}</div>`;
+
+  S.depense = `<div class="screen">${sb()}<div class="body">
+    <div class="fhead"><h3>Nouvelle dépense</h3><span class="sx">${ic('x')}</span></div>
+    <div class="form">
+      <div class="amt"><b>45,80 €</b></div>
+      <label class="field"><span>Quoi</span><div class="inp">Pizzeria Da Marco</div></label>
+      <div class="field"><span>Catégorie</span><div class="chips">${cats.map(c=>`<span class="chip${c==='Restaurants'?' on':''}">${c}</span>`).join('')}<span class="chip add2">+ Autre</span></div></div>
+      <div class="field"><span>Pour</span>${seg('Tous les deux','Juste moi',0,'tl')}</div>
+      <div class="field"><span>Payé par</span>${seg('Lionel','Jaz')}</div>
+      <div class="field"><span>Date</span><div class="inp">Aujourd'hui, 26 oct.</div></div>
+      <p class="calc">Commune, 60 / 40 : Lionel 27,48 € · Jaz 18,32 €<br>Jaz devra 18,32 € à Lionel.</p>
+    </div></div><span class="save">Enregistrer</span></div>`;
+
+  const bc = (i,n,s,m,extra='') => { const over = m && s > m; const f = v => v.toLocaleString('fr-FR',{minimumFractionDigits: v%1?2:0, maximumFractionDigits:2});
+    return `<div class="bc"><div class="row"><span class="eico">${ic(i)}</span><b>${n}</b>${m?`<span>${f(s)} / ${m} €</span>`:`<span>${f(s)} €</span><em>sans plafond</em>`}</div>${m?`<div class="bar${over?' over':''}"><i style="width:${Math.min(100,Math.round(s/m*100))}%"></i></div>`:''}${extra?`<small>${extra}</small>`:''}${over?`<span class="over-note">${f(Math.round((s-m)*100)/100)} € au-dessus du budget</span>`:''}</div>`; };
+  S.budcommun = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('Budgets', '<span class="meta">Octobre · encore 5 jours</span>')}
+    <div class="modes">${seg('Commun','Mon perso',0,'pk')}</div>
+    <div class="btot"><div class="row"><b>1 922,50 €</b><span>dépensés ensemble</span></div><span class="slab">Seulement les dépenses « Tous les deux »</span></div>
+    <div class="scroll">${bc('basket','Courses',286,400)}${bc('fork','Restaurants',96,120)}${bc('store','Sorties',118,150)}${bc('pie','Divertissements',47,0)}${bc('home','Maison',112,100)}${bc('bolt','Factures',1240.5,0)}${bc('jar','Divers',23,0)}</div></div>${tabs('Budgets')}</div>`;
+
+  S.budperso = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('Budgets', '<span class="meta">Octobre · encore 5 jours</span>')}
+    <div class="modes">${seg('Commun','Mon perso',1,'pk')}</div>
+    <div class="btot"><div class="row"><b>1 230,49 €</b></div><span class="slab">Ma part des dépenses communes (1 153,50 €) + mes dépenses perso (76,99 €)</span></div>
+    <div class="scroll">${bc('basket','Courses',171.6,250,'100 % part commune')}${bc('fork','Restaurants',57.6,100,'100 % part commune')}${bc('store','Sorties',95.8,80,'dont 25 € perso')}${bc('pie','Divertissements',68.19,0,'dont 39,99 € perso')}${bc('home','Maison',67.2,0,'100 % part commune')}${bc('bolt','Factures',744.3,0,'100 % part commune')}${bc('jar','Divers',25.8,0,'dont 12 € perso')}</div></div>${tabs('Budgets')}</div>`;
+
+  const todo = [['Cette semaine','pk',[['Descendre le verre','mer. 29 oct.','L'],['Appeler le syndic','jeu. 30 oct.','J'],['Monter l\'étagère','sam. 1er nov.','LJ']]],['Quand on peut','tl',[['Changer l\'ampoule de l\'entrée','','L'],['Trier les papiers','','J'],['Réparer le joint de la douche','','LJ']]],['Fait cette semaine','ink',[['Arroser les plantes','fait hier par Jaz · visible encore 6 j','J',1],['Sortir les poubelles','fait jeudi par Lionel · visible encore 3 j','L',1]]]];
+  S.afaire = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('À faire', presence)}
+    <div class="add">${ic('plus')}<span>Ajouter une tâche…</span></div>
+    <div class="chips" style="padding:0 16px 4px"><span class="chip on">Tout</span><span class="chip">Lionel</span><span class="chip">Jaz</span><span class="chip">Les deux</span></div>
+    <div class="scroll">${todo.map(([h,c,its])=>`<span class="tape c-${c}">${h}</span>`+its.map(([n,d,w,dn])=>`<button class="it${dn?' done':''}" type="button" aria-pressed="${!!dn}">${box}<span class="nm">${n}<s class="strike"></s>${d?`<small>${d}</small>`:''}</span>${who(w)}</button>`).join('')).join('')}</div></div>${tabs('À faire')}</div>`;
+
+  const dues = [
+    ['À venir en octobre','pk',[['28','OCT','Électricité','Chaque mois','72,00 €'],['30','OCT','Assurance habitation','Chaque mois','18,50 €'],['31','OCT','Facture plombier','Une fois','140,00 €']]],
+    ['Novembre','bl',[['5','NOV','Loyer','Chaque mois','1 150,00 €'],['5','NOV','Internet','Chaque mois','29,99 €']]],
+    ['Payé ce mois','ink',[['5','OCT','Loyer','Chaque mois','1 150,00 €',1]]]
+  ];
+  S.apayer = `<div class="screen">${sb()}<div class="deco"></div><div class="body">
+    ${top('À payer', '<span class="meta">Octobre</span>')}
+    <div class="sum"><span>Reste à payer<br>d'ici le 31 octobre</span><b>230,50 €</b></div>
+    <div class="scroll">${dues.map(([h,c,its])=>`<span class="tape c-${c}">${h}</span>`+its.map(([d,m,t,k,a,p])=>`<div class="due${p?' paid':''}"><span class="date"><i>${m}</i><b>${d}</b></span><span class="et"><b>${t}</b><small><span class="${k==='Une fois'?'once':''}">${k}</span></small></span><span class="ea"><b>${a}</b><span class="pay">${p?'Payé':'Marquer payé'}</span></span></div>`).join('')).join('')}</div></div>
+    <span class="fab">${ic('plus')}Ajouter</span>${tabs('À payer')}</div>`;
+
+  // '?' en tête = point encore à trancher
+  const list = [
+    ['code','Code d\'accès','Tout premier lancement',[
+      'Un <b>code commun à 6 chiffres</b> protège l\'appli : sans lui, le lien n\'ouvre rien.',
+      'Il est demandé une seule fois par téléphone, puis mémorisé.',
+      'Le code est vérifié par le serveur, pas seulement dans le téléphone.',
+      'Le code ne se change pas depuis l\'appli (seulement côté serveur).']],
+    ['profil','Choix du profil','Juste après le code',[
+      'Aucun compte : le profil choisi est <b>mémorisé sur le téléphone</b>.',
+      'Toucher son avatar (en haut à droite partout) permet de changer de profil.']],
+    ['courses','Courses','Page d\'accueil',[
+      '<b>Pas de rayons</b> : une seule liste, dans l\'ordre que vous choisissez.',
+      'Appui long puis glisser pour déplacer un article (ici « Café en grains »). L\'ordre est le même sur les deux téléphones.',
+      'Les articles cochés restent barrés à leur place jusqu\'à <b>« Vider le panier »</b>.',
+      'Chaque article montre qui l\'a ajouté (L ou J).',
+      'Un nouvel article s\'ajoute en bas de la liste.']],
+    ['saisie','Ajout d\'un article','Suggestions',[
+      'On tape juste le nom, on valide, l\'article s\'ajoute.',
+      'Suggestions tirées de votre historique commun : d\'abord celles qui <b>commencent par</b> le texte tapé, triées par <b>nombre de fois ajoutées</b>.',
+      'Recherche sans accents ni majuscules : « oeu » trouve « Œufs ».']],
+    ['magasin','Mode magasin','Plein écran',[
+      'Même ordre que la liste, en très gros. L\'écran reste allumé.',
+      'Un article ajouté par l\'autre apparaît en direct.',
+      'En quittant, les articles cochés restent cochés dans la liste.']],
+    ['ticket','Ticket en sortie','En quittant le mode magasin',[
+      'En quittant, l\'appli propose d\'enregistrer le ticket comme dépense.',
+      'Catégorie Courses par défaut, commune par défaut. « Pas maintenant » ferme sans rien créer.']],
+    ['comptes','Comptes','Solde et dépenses',[
+      'Toutes les dépenses communes sont partagées en <b>60 % Lionel / 40 % Jaz</b>.',
+      'Le solde compense les dettes croisées et n\'affiche qu\'un seul montant.',
+      '« Régler » enregistre un remboursement et remet le solde à zéro.',
+      'Les dépenses perso n\'apparaissent pas ici.']],
+    ['depense','Nouvelle dépense','Ajout depuis Comptes',[
+      'Une seule liste de catégories pour les dépenses et les budgets : Courses, Restaurants, Sorties, Divertissements, Maison, Factures, Divers.',
+      '<b>+ Autre</b> crée une nouvelle catégorie réutilisable (ici « Cadeaux »), qu\'on peut supprimer ensuite.',
+      '<b>Pour</b> : « Tous les deux » (partagée 60/40) ou « Juste moi » (perso, hors comptes).',
+      'Si on supprime une catégorie créée, ses dépenses passent dans « Divers ».']],
+    ['budcommun','Budgets · commun','Vue « Commun »',[
+      'Seulement les dépenses « Tous les deux », pour leur montant total.',
+      'Une catégorie peut être <b>sans plafond</b> : on voit juste le montant dépensé.',
+      'Un dépassement s\'affiche en rose rayé, sans alerte.',
+      'Remis à zéro chaque 1er du mois.']],
+    ['budperso','Budgets · perso','Vue « Mon perso »',[
+      'Ma part des dépenses communes (60 % pour Lionel, 40 % pour Jaz) + mes dépenses perso.',
+      'Chacun a ses propres plafonds perso.',
+      'Chacun voit le commun et <b>son propre perso</b>, jamais celui de l\'autre.']],
+    ['afaire','À faire','Tâches de l\'appart',[
+      'Une tâche est pour Lionel, Jaz ou les deux. La date est facultative.',
+      'Les tâches faites restent visibles <b>une semaine</b>, puis disparaissent.',
+      'Pas de rotation automatique ni de félicitations.']],
+    ['apayer','Restes à payer','Factures à venir',[
+      'Deux types : <b>chaque mois</b> (ou chaque année) et <b>une fois</b>.',
+      '« Marquer payé » crée automatiquement la dépense dans Comptes et Budgets, dans la bonne catégorie.',
+      'Une facture récurrente payée se reprogramme pour la période suivante.',
+      'Au clic, l\'appli demande <b>qui a payé : Lionel, Jaz ou les deux</b>. Les factures arrivent dans la catégorie Factures.',
+      '« Les deux » = chacun a payé sa part (60/40) : la facture entre dans les budgets (commun + 60/40 en perso) sans créer de dette dans Comptes.']]
+  ];
+  document.getElementById('grid').innerHTML = list.map(([k,t,s,notes]) =>
+    `<figure><div class="phone">${S[k]}</div><figcaption><h2>${t} <small>${s}</small></h2><ul class="notes">${notes.map(n=>n[0]==='?'?`<li class="q">${n.slice(1)}</li>`:`<li>${n}</li>`).join('')}</ul></figcaption></figure>`).join('');
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('button.it, button.sit'); if (!b) return;
+    const on = b.classList.toggle('done'); b.setAttribute('aria-pressed', on);
+    if (b.classList.contains('sit')) {
+      const scr = b.closest('.screen'); const left = scr.querySelectorAll('.sit:not(.done)').length;
+      scr.querySelector('[data-left]').textContent = left + (left > 1 ? ' restants' : ' restant');
+      scr.querySelector('[data-prog]').style.width = Math.round((9 - left) / 9 * 100) + '%';
+    }
+  });
+})();
+</script>
