@@ -10,8 +10,10 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#FFE14D",
-    theme_color: "#FFE14D",
+    // Blanc comme la barre d'onglets : Android fige ces couleurs à l'installation (barre du bas, écran de lancement),
+    // elles ne peuvent pas suivre le thème. La barre du haut suit le thème via <meta name="theme-color">.
+    background_color: "#FFFFFF",
+    theme_color: "#FFFFFF",
     icons: [
       { src: "/pwa-icon/192", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/pwa-icon/512", sizes: "512x512", type: "image/png", purpose: "any" },

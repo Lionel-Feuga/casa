@@ -82,6 +82,10 @@ export function RealtimeProvider({ profile, children }: { profile: Profile; chil
           setStatus("offline");
         }
       });
+      if (client.connection.state === "connected") {
+        wasConnected.current = true;
+        setStatus("connected");
+      }
 
       const channel = client.channels.get(CHANNEL);
       await channel.subscribe("change", (msg) => {

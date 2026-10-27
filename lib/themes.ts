@@ -22,4 +22,4 @@ export const themeBootScript = `(function(){try{var m=${JSON.stringify(
   Object.fromEntries(THEMES.map((t) => [t.id, t.y])),
 )};var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(!m[t])t=${JSON.stringify(
   DEFAULT_THEME,
-)};document.documentElement.setAttribute('data-theme',t);var c=document.querySelector('meta[name="theme-color"]');if(c)c.setAttribute('content',m[t]);}catch(e){}})();`;
+)};document.documentElement.setAttribute('data-theme',t);var c=document.querySelector('meta[name="theme-color"]');if(!c){c=document.createElement('meta');c.setAttribute('name','theme-color');document.head.appendChild(c);}c.setAttribute('content',m[t]);}catch(e){}})();`;

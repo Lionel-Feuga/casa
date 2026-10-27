@@ -19,13 +19,16 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: THEMES.find((t) => t.id === DEFAULT_THEME)!.y,
 };
+
+const defaultThemeColor = THEMES.find((t) => t.id === DEFAULT_THEME)!.y;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" data-theme={DEFAULT_THEME} className={`${bagel.variable} ${figtree.variable}`} suppressHydrationWarning>
       <head>
+        {/* Géré à la main (et non via viewport.themeColor) pour que Next ne le remette pas à jour derrière nous */}
+        <meta name="theme-color" content={defaultThemeColor} />
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
       </head>
       <body>
