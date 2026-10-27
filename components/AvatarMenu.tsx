@@ -1,5 +1,6 @@
 "use client";
 
+import { Tags } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { PROFILE_INITIAL, PROFILE_LABEL } from "@/lib/domain/profile";
@@ -8,7 +9,7 @@ import { useSession } from "./Providers";
 import { Sheet } from "./Sheet";
 import { ThemeSheet } from "./ThemeSheet";
 
-// Menu de l'avatar. « Gérer les catégories » et « Gérer les budgets » arriveront aux étapes 4 et 5.
+// Menu de l'avatar. « Gérer les budgets » arrivera à l'étape 5.
 export function AvatarMenu() {
   const { profile } = useSession();
   const router = useRouter();
@@ -33,6 +34,10 @@ export function AvatarMenu() {
             <button type="button" className="btn" onClick={() => setOpen("theme")}>
               <Icon name="palette" />
               Thème
+            </button>
+            <button type="button" className="btn" onClick={() => router.push("/reglages/categories")}>
+              <Tags size={20} strokeWidth={2.6} aria-hidden="true" />
+              Gérer les catégories
             </button>
           </div>
         </Sheet>

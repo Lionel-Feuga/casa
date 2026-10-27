@@ -64,3 +64,37 @@ export async function shoppingItems(): Promise<Collection<ShoppingItemDoc>> {
 export async function itemHistory(): Promise<Collection<ItemHistoryDoc>> {
   return (await getDb()).collection<ItemHistoryDoc>("item_history");
 }
+
+export interface ExpenseDoc {
+  _id: ObjectId;
+  label: string;
+  amountCents: number;
+  categoryId: ObjectId;
+  scope: "shared" | "personal";
+  paidBy: Profile | "both";
+  owner?: Profile;
+  date: Date;
+  source: "manual" | "ticket" | "bill";
+  billId?: ObjectId;
+  createdBy: Profile;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SettlementDoc {
+  _id: ObjectId;
+  from: Profile;
+  to: Profile;
+  amountCents: number;
+  date: Date;
+  createdBy: Profile;
+  createdAt: Date;
+}
+
+export async function expenses(): Promise<Collection<ExpenseDoc>> {
+  return (await getDb()).collection<ExpenseDoc>("expenses");
+}
+
+export async function settlements(): Promise<Collection<SettlementDoc>> {
+  return (await getDb()).collection<SettlementDoc>("settlements");
+}

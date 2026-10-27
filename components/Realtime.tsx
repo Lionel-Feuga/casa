@@ -20,6 +20,12 @@ export const useRealtime = () => useContext(RealtimeContext);
 
 const POLL_MS = 15_000;
 
+// Données à recharger selon ce qui a changé : le solde dépend des règlements, les dépenses des catégories.
+const RELATED: Partial<Record<ChangeMessage["type"], string[]>> = {
+  settlements: ["settlements", "expenses"],
+  categories: ["categories", "expenses"],
+};
+
 export function RealtimeProvider({ profile, children }: { profile: Profile; children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<Status>("connecting");
@@ -90,7 +96,8 @@ export function RealtimeProvider({ profile, children }: { profile: Profile; chil
       const channel = client.channels.get(CHANNEL);
       await channel.subscribe("change", (msg) => {
         const data = msg.data as ChangeMessage | undefined;
-        if (data?.type) queryClient.invalidateQueries({ queryKey: [data.type] });
+        if (!data?.type) return;
+        for (const key of RELATED[data.type] ?? [data.type]) queryClient.invalidateQueries({ queryKey: [key] });
       });
 
       const syncPresence = async () => {

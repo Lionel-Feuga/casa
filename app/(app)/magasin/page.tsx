@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icon";
+import { TicketSheet } from "@/components/money/TicketSheet";
 import { useSession } from "@/components/Providers";
 import { useShoppingActions, useShoppingItems } from "@/lib/client/shopping";
 import { setStatusBar } from "@/lib/client/theme";
@@ -33,7 +34,11 @@ export default function MagasinPage() {
   const left = items.filter((i) => !i.checked).length;
   const done = items.length - left;
   const progress = items.length ? Math.round((done / items.length) * 100) : 0;
-  const exit = () => router.replace("/");
+  // Ticket proposé seulement si au moins un article a été coché pendant la session (section 3.7).
+  const checkedHere = useRef(new Set<string>());
+  const [ticket, setTicket] = useState(false);
+  const leave = () => router.replace("/");
+  const exit = () => (checkedHere.current.size > 0 ? setTicket(true) : leave());
 
   return (
     <div className="store">
@@ -66,7 +71,11 @@ export default function MagasinPage() {
                   className={`sit${item.checked ? " done" : ""}`}
                   role="checkbox"
                   aria-checked={item.checked}
-                  onClick={() => toggle.mutate({ id: item.id, checked: !item.checked })}
+                  onClick={() => {
+                    if (item.checked) checkedHere.current.delete(item.id);
+                    else checkedHere.current.add(item.id);
+                    toggle.mutate({ id: item.id, checked: !item.checked });
+                  }}
                 >
                   <span className="box" aria-hidden="true">
                     <Icon name="check" />
@@ -93,6 +102,8 @@ export default function MagasinPage() {
       <button type="button" className="sexit" onClick={exit}>
         Quitter le mode magasin
       </button>
+
+      {ticket && <TicketSheet onClose={leave} />}
     </div>
   );
 }
