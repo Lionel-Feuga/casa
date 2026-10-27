@@ -6,17 +6,19 @@ import {
   MouseSensor,
   TouchSensor,
   closestCenter,
+  defaultDropAnimationSideEffects,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
+  type DropAnimation,
   type Modifier,
   type MouseSensorOptions,
   type TouchSensorOptions,
 } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { useRef, useState } from "react";
-import { positionForMove, type ShoppingItem } from "@/lib/domain/shopping";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { positionForMove, sortItems, type ShoppingItem } from "@/lib/domain/shopping";
 import { ItemFace, ItemRow } from "./ItemRow";
 
 const onHandle = (target: EventTarget | null) => target instanceof Element && !!target.closest("[data-handle]");
@@ -45,10 +47,17 @@ class CasaMouseSensor extends MouseSensor {
   }
 }
 
+// Au lâcher, l'article soulevé se pose sur sa nouvelle place ; l'emplacement reste caché pendant ce temps.
+const dropAnimation: DropAnimation = {
+  duration: 180,
+  easing: "cubic-bezier(.3,1.3,.5,1)",
+  sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: "0" } } }),
+};
+
 const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
 export function ShoppingList({
-  items,
+  items: incoming,
   flashId,
   onToggle,
   onDelete,
@@ -64,6 +73,18 @@ export function ShoppingList({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const lastDragEnd = useRef(0);
+
+  // Le cache de TanStack Query notifie l'écran au tour suivant : sans cet ordre local, la liste
+  // s'afficherait une image dans l'ancien ordre après le lâcher, puis sauterait au nouveau.
+  const [pending, setPending] = useState<{ id: string; position: string } | null>(null);
+  const items = useMemo(
+    () => (pending ? sortItems(incoming.map((i) => (i.id === pending.id ? { ...i, position: pending.position } : i))) : incoming),
+    [incoming, pending],
+  );
+  useEffect(() => {
+    if (pending && incoming.find((i) => i.id === pending.id)?.position === pending.position) setPending(null);
+  }, [incoming, pending]);
+
   const active = items.find((i) => i.id === activeId);
 
   const onDragStart = (e: DragStartEvent) => {
@@ -79,7 +100,10 @@ export function ShoppingList({
     const from = items.findIndex((i) => i.id === e.active.id);
     const to = items.findIndex((i) => i.id === e.over!.id);
     if (from < 0 || to < 0) return;
-    onMove(String(e.active.id), positionForMove(items, from, to));
+    const id = String(e.active.id);
+    const position = positionForMove(items, from, to);
+    setPending({ id, position });
+    onMove(id, position);
   };
 
   return (
@@ -113,7 +137,7 @@ export function ShoppingList({
           ))}
         </ul>
       </SortableContext>
-      <DragOverlay dropAnimation={{ duration: 180, easing: "cubic-bezier(.3,1.3,.5,1)" }}>
+      <DragOverlay dropAnimation={dropAnimation}>
         {active ? <ItemFace item={active} className="lift" /> : null}
       </DragOverlay>
     </DndContext>
