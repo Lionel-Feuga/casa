@@ -75,7 +75,7 @@ export default function CoursesPage() {
             actions.remove.mutate(i);
             setUndo(i);
           }}
-          onMove={(id, position) => actions.move.mutate({ id, position })}
+          onMove={actions.move}
         />
       ) : isPending ? null : (
         <div className="card empty">

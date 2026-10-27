@@ -165,11 +165,11 @@
   cursor: pointer;
   position: absolute;
   inset: 0 0 0 auto;
-  width: 110px;
+  width: 100px;
+  box-shadow: 3px 3px 0 var(--ink);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  padding-right: 16px;
+  justify-content: center;
   border-radius: var(--r);
   border: var(--line) solid var(--ink);
   background: var(--pk);

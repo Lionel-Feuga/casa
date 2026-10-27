@@ -7,7 +7,7 @@ import type { ShoppingItem } from "@/lib/domain/shopping";
 import { PROFILE_INITIAL } from "@/lib/domain/profile";
 import { Icon } from "../Icon";
 
-const SWIPE_OPEN = -100;
+const SWIPE_OPEN = -112; // bouton de 100 px + 12 px d’espace
 const SWIPE_START = 10;
 
 export function ItemFace({

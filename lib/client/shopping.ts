@@ -107,17 +107,20 @@ export function useShoppingActions() {
     onSettled: settle,
   });
 
-  const move = useMutation({
-    mutationFn: (v: { id: string; position: string }) =>
+  const moveMutation = useMutation({
+    mutationFn: (v: { id: string; position: string; prev: ShoppingItem[] }) =>
       api(`/shopping/${v.id}`, { method: "PATCH", body: JSON.stringify({ position: v.position }) }),
-    onMutate: async ({ id, position }) => {
-      const prev = await optimistic();
-      setItems((items) => items.map((i) => (i.id === id ? { ...i, position } : i)));
-      return prev;
-    },
-    onError: rollback,
+    onError: (_e, v) => qc.setQueryData(ITEMS_KEY, v.prev),
     onSettled: settle,
   });
+  // Le nouvel ordre est appliqué dans le même rendu que le lâcher, sinon les articles
+  // reviendraient une image à leur place d'origine avant de sauter au bon endroit.
+  const move = (id: string, position: string) => {
+    const prev = current();
+    void qc.cancelQueries({ queryKey: ITEMS_KEY });
+    setItems((items) => items.map((i) => (i.id === id ? { ...i, position } : i)));
+    moveMutation.mutate({ id, position, prev });
+  };
 
   const remove = useMutation({
     mutationFn: (item: ShoppingItem) => api(`/shopping/${item.id}`, { method: "DELETE" }),
