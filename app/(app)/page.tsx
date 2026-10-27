@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { Icon } from "@/components/Icon";
@@ -82,6 +83,11 @@ export default function CoursesPage() {
           {isError ? <p>Impossible de charger la liste. Vérifie le réseau.</p> : <p>La liste est vide.</p>}
         </div>
       )}
+
+      <Link href="/magasin" className="fab">
+        <Icon name="store" />
+        Mode magasin
+      </Link>
 
       {undo && (
         <div className="toast" role="status">

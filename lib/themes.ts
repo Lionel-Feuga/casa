@@ -1,11 +1,11 @@
 // Six thèmes de couleurs (cahier des charges, section 9). Doit rester aligné avec styles/tokens.css.
 export const THEMES = [
-  { id: "original", name: "Original", y: "#FFE14D", pk: "#FF4F8B" },
-  { id: "piscine", name: "Piscine", y: "#5CC8FF", pk: "#FF5DA2" },
-  { id: "pistache", name: "Pistache & framboise", y: "#C6E77A", pk: "#E8336D" },
-  { id: "lagon", name: "Lagon & mangue", y: "#2EC4B6", pk: "#FF9F1C" },
-  { id: "cerise", name: "Bonbon cerise", y: "#FF8FB3", pk: "#FFE14D" },
-  { id: "agrume", name: "Agrume", y: "#FFA62B", pk: "#2E5BFF" },
+  { id: "original", name: "Original", y: "#FFE14D", ink: "#1B1B3A", pk: "#FF4F8B" },
+  { id: "piscine", name: "Piscine", y: "#5CC8FF", ink: "#0B1E3F", pk: "#FF5DA2" },
+  { id: "pistache", name: "Pistache & framboise", y: "#C6E77A", ink: "#1D2A10", pk: "#E8336D" },
+  { id: "lagon", name: "Lagon & mangue", y: "#2EC4B6", ink: "#0E2233", pk: "#FF9F1C" },
+  { id: "cerise", name: "Bonbon cerise", y: "#FF8FB3", ink: "#2A0F2A", pk: "#FFE14D" },
+  { id: "agrume", name: "Agrume", y: "#FFA62B", ink: "#241300", pk: "#2E5BFF" },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];

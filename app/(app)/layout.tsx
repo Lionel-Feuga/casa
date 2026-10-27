@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSession } from "@/components/Providers";
 import { RealtimeProvider } from "@/components/Realtime";
@@ -10,6 +10,7 @@ import { TabBar } from "@/components/TabBar";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { ready, hasToken, profile } = useSession();
   const router = useRouter();
+  const fullScreen = usePathname() === "/magasin"; // mode magasin : sans barre d'onglets ni décor
 
   useEffect(() => {
     if (!ready) return;
@@ -21,11 +22,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <RealtimeProvider profile={profile}>
-      <div className="app">
-        <div className="deco" aria-hidden="true" />
-        {children}
-      </div>
-      <TabBar />
+      {fullScreen ? (
+        children
+      ) : (
+        <>
+          <div className="app">
+            <div className="deco" aria-hidden="true" />
+            {children}
+          </div>
+          <TabBar />
+        </>
+      )}
     </RealtimeProvider>
   );
 }

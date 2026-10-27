@@ -32,6 +32,13 @@ const PATHS = {
       <path d="M10 21v-6h4v6" />
     </>
   ),
+  store: (
+    <>
+      <path d="M3 9.5L5 4h14l2 5.5" />
+      <path d="M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" />
+      <path d="M4.5 12v8.5h15V12M10 20.5V15h4v5.5" />
+    </>
+  ),
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   plus: <path d="M12 5v14M5 12h14" />,
   x: <path d="M6 6l12 12M18 6L6 18" />,

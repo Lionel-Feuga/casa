@@ -19,3 +19,10 @@ export function applyTheme(id: ThemeId): void {
   const color = THEMES.find((t) => t.id === id)!.y;
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", color));
 }
+
+/** Couleur de la barre d'état : encre en mode magasin, fond du thème ailleurs. */
+export function setStatusBar(kind: "y" | "ink"): void {
+  const theme = THEMES.find((t) => t.id === currentTheme())!;
+  const color = kind === "ink" ? theme.ink : theme.y;
+  document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", color));
+}
