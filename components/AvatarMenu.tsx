@@ -7,6 +7,7 @@ import { PROFILE_INITIAL, PROFILE_LABEL } from "@/lib/domain/profile";
 import { Icon } from "./Icon";
 import { useSession } from "./Providers";
 import { Sheet } from "./Sheet";
+import { TestResetButton } from "./TestReset";
 import { ThemeSheet } from "./ThemeSheet";
 
 // Menu de l'avatar (section 2.2) : profil, thème, catégories et plafonds.
@@ -43,6 +44,7 @@ export function AvatarMenu() {
               <Gauge size={20} strokeWidth={2.6} aria-hidden="true" />
               Gérer les budgets
             </button>
+            <TestResetButton onDone={close} />
           </div>
         </Sheet>
       )}
