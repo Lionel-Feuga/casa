@@ -1,0 +1,174 @@
+/* ============ À payer (section 8) ============ */
+.sum {
+  padding: 12px 16px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 var(--pk);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.sum span {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.sum b {
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 30px;
+  color: var(--y);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tape.c-pk {
+  background: var(--pk);
+  color: var(--on);
+}
+.tape.c-bl {
+  background: var(--bl);
+}
+.tape.c-tl {
+  background: var(--tl);
+  color: var(--ontl);
+  transform: rotate(1.5deg);
+}
+.tape.c-ink {
+  background: var(--ink);
+}
+.dlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.due {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 10px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r);
+}
+.due.paid {
+  background: var(--soft);
+  border-style: dashed;
+}
+.due .open {
+  all: unset;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.due .open:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.date {
+  width: 44px;
+  flex: none;
+  text-align: center;
+  border: var(--line) solid var(--ink);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--wh);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.date i {
+  display: block;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: var(--pk);
+  color: var(--on);
+  padding: 1px 0;
+}
+.date b {
+  display: block;
+  font-family: var(--f-disp);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.25;
+}
+.due .et small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+  opacity: 1;
+}
+.tag {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--y);
+  border: 1.5px solid var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+.tag.once {
+  background: var(--tl);
+  color: var(--ontl);
+}
+.tag.perso {
+  background: var(--bl);
+  color: #fff;
+}
+.tag.late {
+  background: var(--pk);
+  color: var(--on);
+}
+.due .side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.due .side b {
+  font-size: 14.5px;
+  white-space: nowrap;
+}
+.pay {
+  all: unset;
+  cursor: pointer;
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 2px solid var(--ink);
+  background: var(--y);
+  box-shadow: 2px 2px 0 var(--ink);
+  white-space: nowrap;
+}
+.pay:active {
+  translate: 2px 2px;
+  box-shadow: 0 0 0 var(--ink);
+}
+.pay:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.pay.done {
+  background: var(--ink);
+  color: var(--y);
+  box-shadow: none;
+  cursor: default;
+}

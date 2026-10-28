@@ -17,7 +17,7 @@ export const GET = withProfile(async (req, _ctx, profile) => {
 
 export const POST = withProfile(async (req, _ctx, profile) => {
   const body = ExpenseBody.safeParse(await readJson(req));
-  if (!body.success) return json({ error: "invalid" }, 400);
+  if (!body.success || body.data.paidBy === "both") return json({ error: "invalid" }, 400);
   if (!(await categoryExists(body.data.categoryId))) return json({ error: "category" }, 400);
   return json({ expense: await createExpense(body.data, profile) }, 201);
 });

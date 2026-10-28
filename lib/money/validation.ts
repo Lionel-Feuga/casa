@@ -9,7 +9,7 @@ export const ExpenseBody = z.object({
   amountCents: z.number().int().positive().max(MAX_AMOUNT_CENTS),
   categoryId: z.string().regex(/^[0-9a-f]{24}$/i),
   scope: z.enum(["shared", "personal"]),
-  paidBy: z.enum(PROFILES),
+  paidBy: z.enum([...PROFILES, "both"]),
   date: z.string().refine(isDay),
   source: z.enum(["manual", "ticket"]).optional(),
 });

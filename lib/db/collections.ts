@@ -76,6 +76,9 @@ export interface ExpenseDoc {
   date: Date;
   source: "manual" | "ticket" | "bill";
   billId?: ObjectId;
+  /** Échéance de la facture avant et après ce paiement, pour la remettre si la dépense est supprimée. */
+  billPrevDueDate?: Date;
+  billNextDueDate?: Date;
   createdBy: Profile;
   createdAt: Date;
   updatedAt: Date;
@@ -108,4 +111,24 @@ export interface BudgetDoc {
 
 export async function budgets(): Promise<Collection<BudgetDoc>> {
   return (await getDb()).collection<BudgetDoc>("budgets");
+}
+
+export interface BillDoc {
+  _id: ObjectId;
+  label: string;
+  amountCents: number;
+  categoryId: ObjectId;
+  scope: "shared" | "personal";
+  owner?: Profile;
+  kind: "recurring" | "once";
+  every?: "month" | "year";
+  dueDate: Date;
+  dayOfMonth: number;
+  paid: boolean;
+  createdBy: Profile;
+  createdAt: Date;
+}
+
+export async function bills(): Promise<Collection<BillDoc>> {
+  return (await getDb()).collection<BillDoc>("bills");
 }

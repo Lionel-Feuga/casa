@@ -10,9 +10,9 @@ import { TabBar } from "@/components/TabBar";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { ready, hasToken, profile } = useSession();
   const router = useRouter();
-  // Mode magasin et formulaire de dépense : sans barre d'onglets ni décor.
+  // Mode magasin et formulaires : sans barre d'onglets ni décor.
   const path = usePathname();
-  const fullScreen = path === "/magasin" || path === "/comptes/nouvelle";
+  const fullScreen = ["/magasin", "/comptes/nouvelle", "/a-payer/facture"].includes(path);
 
   useEffect(() => {
     if (!ready) return;

@@ -1,5 +1,5 @@
 import { ObjectId, type Filter } from "mongodb";
-import { categories, expenses, settlements, type CategoryDoc, type ExpenseDoc, type SettlementDoc } from "@/lib/db/collections";
+import { bills, categories, expenses, settlements, type CategoryDoc, type ExpenseDoc, type SettlementDoc } from "@/lib/db/collections";
 import { getDb } from "@/lib/db/mongo";
 import { cleanName } from "@/lib/domain/shopping";
 import { FALLBACK_CATEGORY_KEY, sortCategories, type Category } from "@/lib/domain/categories";
@@ -93,7 +93,8 @@ export interface ExpenseInput {
   amountCents: number;
   categoryId: string;
   scope: Scope;
-  paidBy: Profile;
+  /** « both » seulement pour une dépense créée par une facture commune. */
+  paidBy: Payer;
   date: Day;
   source?: "manual" | "ticket";
 }
@@ -136,8 +137,10 @@ export async function createExpense(input: ExpenseInput, by: Profile): Promise<E
 
 export async function updateExpense(id: string, input: ExpenseInput, by: Profile): Promise<Expense | null> {
   const fields = fieldsFrom(input, by);
+  // « Payé par les deux » n'existe que pour les factures communes.
+  const extra: Filter<ExpenseDoc> = input.paidBy === "both" ? { source: "bill", scope: "shared" } : {};
   const doc = await (await expenses()).findOneAndUpdate(
-    { _id: new ObjectId(id), ...visibleTo(by) },
+    { _id: new ObjectId(id), ...visibleTo(by), ...extra },
     { $set: { ...fields, updatedAt: new Date() }, ...(input.scope === "shared" ? { $unset: { owner: "" } } : {}) },
     { returnDocument: "after" },
   );
@@ -147,9 +150,26 @@ export async function updateExpense(id: string, input: ExpenseInput, by: Profile
 }
 
 export async function deleteExpense(id: string, by: Profile): Promise<boolean> {
-  const res = await (await expenses()).deleteOne({ _id: new ObjectId(id), ...visibleTo(by) });
-  if (res.deletedCount) await publishChange("expenses", by);
-  return res.deletedCount > 0;
+  const doc = await (await expenses()).findOneAndDelete({ _id: new ObjectId(id), ...visibleTo(by) });
+  if (!doc) return false;
+  await restoreBill(doc, by);
+  await publishChange("expenses", by);
+  return true;
+}
+
+/**
+ * Supprimer la dépense créée par « Marquer payé » remet la facture dans son état précédent
+ * (section 8.2), seulement si elle n'a pas été payée de nouveau depuis.
+ */
+async function restoreBill(e: ExpenseDoc, by: Profile): Promise<void> {
+  if (e.source !== "bill" || !e.billId || !e.billPrevDueDate) return;
+  const col = await bills();
+  const bill = await col.findOne({ _id: e.billId });
+  if (!bill) return;
+  const latest = bill.kind === "recurring" ? bill.dueDate.getTime() === e.billNextDueDate?.getTime() : bill.paid;
+  if (!latest) return;
+  await col.updateOne({ _id: bill._id }, { $set: { dueDate: e.billPrevDueDate, paid: false } });
+  await publishChange("bills", by);
 }
 
 // ---------- Solde et règlements (sections 5.3 et 5.4) ----------

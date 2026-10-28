@@ -22,7 +22,8 @@ const fmt = new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFr
 
 /** 4580 → « 45,80 € » (espaces insécables, comme le reste de l'appli). */
 export function formatEuros(cents: number): string {
-  return `${fmt.format(cents / 100)} €`;
+  // Espace fine insécable remplacée par une espace insécable : Bagel Fat One n'a pas ce caractère.
+  return `${fmt.format(cents / 100).replace(/ /g, " ")} €`;
 }
 
 /** Saisie en cours affichée telle quelle dans le champ montant. */
@@ -88,10 +89,11 @@ export function settlementFor(balanceCents: number): SettlementSource | null {
 }
 
 /** Aperçu sous le formulaire de dépense (section 5.1). */
-export function describeExpense(e: { amountCents: number | null; scope: Scope; paidBy: Profile }): string[] {
+export function describeExpense(e: { amountCents: number | null; scope: Scope; paidBy: Payer }): string[] {
   if (e.scope === "personal") return ["Perso : seulement dans ton budget, pas dans les Comptes."];
   if (!e.amountCents) return ["Commune, partagée 60 / 40."];
   const s = splitShares(e.amountCents);
   const head = `Commune, 60 / 40 : Lionel ${formatEuros(s.lionel)} · Jaz ${formatEuros(s.jaz)}`;
+  if (e.paidBy === "both") return [head, "Chacun a payé sa part : pas de dette."];
   return [head, e.paidBy === "lionel" ? `Jaz devra ${formatEuros(s.jaz)} à Lionel.` : `Lionel devra ${formatEuros(s.lionel)} à Jaz.`];
 }

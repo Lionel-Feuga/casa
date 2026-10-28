@@ -54,6 +54,7 @@ export function useMoneyActions() {
     void qc.invalidateQueries({ queryKey: ["expenses"] });
     void qc.invalidateQueries({ queryKey: ["settlements"] });
     void qc.invalidateQueries({ queryKey: ["budgets"] });
+    void qc.invalidateQueries({ queryKey: ["bills"] });
   };
 
   const saveExpense = useMutation({

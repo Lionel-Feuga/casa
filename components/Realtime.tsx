@@ -22,7 +22,8 @@ const POLL_MS = 15_000;
 
 // Données à recharger selon ce qui a changé : le solde dépend des règlements, les budgets des dépenses.
 const RELATED: Partial<Record<ChangeMessage["type"], string[]>> = {
-  expenses: ["expenses", "budgets"],
+  expenses: ["expenses", "budgets", "bills"],
+  bills: ["bills", "expenses", "budgets"],
   settlements: ["settlements", "expenses"],
   categories: ["categories", "expenses", "budgets"],
 };

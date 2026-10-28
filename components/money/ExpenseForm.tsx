@@ -5,8 +5,7 @@ import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { useSession } from "@/components/Providers";
 import { useMoneyActions, type Expense } from "@/lib/client/money";
 import { dayInParis, isDay } from "@/lib/domain/dates";
-import { centsToInput, describeExpense, parseAmount, type Scope } from "@/lib/domain/money";
-import type { Profile } from "@/lib/domain/profile";
+import { centsToInput, describeExpense, parseAmount, type Payer, type Scope } from "@/lib/domain/money";
 import { CategoryPicker } from "./CategoryPicker";
 import { Segmented } from "./Segmented";
 
@@ -22,7 +21,7 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
   const [label, setLabel] = useState(expense?.label ?? "");
   const [categoryId, setCategoryId] = useState<string | null>(expense?.categoryId ?? null);
   const [scope, setScope] = useState<Scope>(expense?.scope ?? defaultScope);
-  const [paidBy, setPaidBy] = useState<Profile>(expense && expense.paidBy !== "both" ? expense.paidBy : me);
+  const [paidBy, setPaidBy] = useState<Payer>(expense?.paidBy ?? me);
   const [day, setDay] = useState(expense?.date ?? dayInParis());
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -93,16 +92,18 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
           </div>
         )}
 
-        {scope === "shared" && !(fromBill && expense?.paidBy === "both") && (
+        {scope === "shared" && (
           <div className="field">
             <span>Payé par</span>
-            <Segmented
+            <Segmented<Payer>
               label="Payé par"
               value={paidBy}
               onChange={setPaidBy}
               options={[
                 { value: "lionel", label: "Lionel" },
                 { value: "jaz", label: "Jaz" },
+                // « Les deux » (chacun sa part) n'existe que pour une facture commune.
+                ...(fromBill ? [{ value: "both" as const, label: "Les deux" }] : []),
               ]}
             />
           </div>
