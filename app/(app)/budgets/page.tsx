@@ -104,7 +104,7 @@ function BudgetsScreen() {
         })}
       </ul>
 
-      <Link href={mode === "me" ? "/comptes/nouvelle?pour=moi" : "/comptes/nouvelle"} className="fab light">
+      <Link href={mode === "me" ? "/comptes/nouvelle?pour=moi" : "/comptes/nouvelle"} className="fab light" data-online-only>
         + Dépense
       </Link>
     </Screen>

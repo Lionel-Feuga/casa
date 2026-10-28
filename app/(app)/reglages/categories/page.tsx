@@ -37,7 +37,7 @@ export default function CategoriesPage() {
               {c.isDefault ? (
                 <em>par défaut</em>
               ) : (
-                <button type="button" className="del2" onClick={() => setRemoving(c)}>
+                <button type="button" className="del2" data-online-only onClick={() => setRemoving(c)}>
                   Supprimer
                 </button>
               )}

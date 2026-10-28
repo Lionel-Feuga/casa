@@ -25,7 +25,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { staleTime: 10_000, refetchOnWindowFocus: true, retry: 1 } },
+        // offlineFirst : sans réseau, on tente quand même la requête pour que le service worker
+        // renvoie les dernières données connues (section 10.7).
+        defaultOptions: { queries: { staleTime: 10_000, refetchOnWindowFocus: true, retry: 1, networkMode: "offlineFirst" } },
       }),
   );
   const [state, setState] = useState({ ready: false, hasToken: false, profile: null as Profile | null });

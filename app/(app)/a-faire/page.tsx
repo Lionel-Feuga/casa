@@ -23,7 +23,7 @@ function TaskRow({ task, now, onToggle, onEdit }: { task: Task; now: Date; onTog
   const sub = task.done ? doneLabel(task, now) : task.dueDate ? `${late ? "en retard · " : ""}${dueLabel(task.dueDate)}` : null;
   const who = WHO[task.assignee];
   return (
-    <li>
+    <li data-online-only>
       <div
         className={`it${task.done ? " done" : ""}`}
         role="checkbox"
@@ -87,7 +87,7 @@ export default function AFairePage() {
 
   return (
     <Screen title="À faire">
-      <button type="button" className="add addbtn" onClick={() => setSheet({})}>
+      <button type="button" className="add addbtn" data-online-only onClick={() => setSheet({})}>
         <Icon name="plus" />
         <span>Ajouter une tâche</span>
       </button>

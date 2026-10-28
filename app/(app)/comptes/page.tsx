@@ -27,10 +27,10 @@ function BalanceCard({ onSettle }: { onSettle: () => void }) {
         </p>
       )}
       <div className="bact">
-        <button type="button" className="btn y" onClick={onSettle} disabled={!data || b === 0}>
+        <button type="button" className="btn y" data-online-only onClick={onSettle} disabled={!data || b === 0}>
           Régler
         </button>
-        <Link href="/comptes/nouvelle" className="btn t">
+        <Link href="/comptes/nouvelle" className="btn t" data-online-only>
           + Dépense
         </Link>
       </div>
@@ -56,7 +56,7 @@ function MonthEntries({ month, first, onSettlement }: { month: Month; first: boo
               const s = e.settlement;
               return (
                 <li key={s.id}>
-                  <button type="button" className="er settle" onClick={() => onSettlement(s)}>
+                  <button type="button" className="er settle" data-online-only onClick={() => onSettlement(s)}>
                     <span className="eico">
                       <ArrowLeftRight size={20} strokeWidth={2.6} aria-hidden="true" />
                     </span>

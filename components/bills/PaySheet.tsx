@@ -77,7 +77,7 @@ export function PaySheet({ bill, onClose }: { bill: Bill; onClose: () => void })
         <button type="button" className="btn" onClick={onClose}>
           Annuler
         </button>
-        <button type="button" className="btn go" onClick={save}>
+        <button type="button" className="btn go" data-online-only onClick={save}>
           Marquer payé
         </button>
       </div>

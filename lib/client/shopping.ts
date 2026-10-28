@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { findDuplicate, positionAtEnd, sortItems, cleanName, type ShoppingItem, type Suggestion } from "@/lib/domain/shopping";
 import { api, getStoredProfile } from "./api";
+import { sendOrQueue } from "./offlineQueue";
 import { readLocal, writeLocal } from "./storage";
 
 const ITEMS_KEY = ["shopping"] as const;
@@ -33,6 +34,8 @@ export function useShoppingItems() {
     queryFn: async () => sortItems((await api<{ items: ShoppingItem[] }>("/shopping")).items),
     initialData: readCache,
     initialDataUpdatedAt: 0,
+    // Au retour du réseau, la file d'attente est rejouée d'abord, puis la liste relue (useOfflineSync).
+    refetchOnReconnect: false,
   });
   useEffect(() => {
     if (query.data) writeLocal(CACHE_KEY, JSON.stringify(query.data));
@@ -64,12 +67,16 @@ export function useShoppingActions() {
     if (prev) qc.setQueryData(ITEMS_KEY, prev);
   };
   // Une seule relecture quand plusieurs actions s'enchaînent, pour éviter que la liste saute.
+  // Hors ligne, on garde l'état local : il sera confirmé quand la file d'attente aura été rejouée.
   const settle = () => {
-    if (qc.isMutating() <= 1) return qc.invalidateQueries({ queryKey: ITEMS_KEY });
+    if (navigator.onLine && qc.isMutating() <= 1) return qc.invalidateQueries({ queryKey: ITEMS_KEY });
   };
+  // Les écritures des Courses marchent sans réseau (section 10.7).
+  const offline = { networkMode: "always" } as const;
 
   const add = useMutation({
-    mutationFn: (v: { id: string; name: string }) => api("/shopping", { method: "POST", body: JSON.stringify(v) }),
+    ...offline,
+    mutationFn: (v: { id: string; name: string }) => sendOrQueue("/shopping", { method: "POST", body: JSON.stringify(v) }),
     onMutate: async ({ id, name }) => {
       const prev = await optimistic();
       const dup = findDuplicate(prev, name);
@@ -96,8 +103,9 @@ export function useShoppingActions() {
   });
 
   const toggle = useMutation({
+    ...offline,
     mutationFn: (v: { id: string; checked: boolean }) =>
-      api(`/shopping/${v.id}`, { method: "PATCH", body: JSON.stringify({ checked: v.checked }) }),
+      sendOrQueue(`/shopping/${v.id}`, { method: "PATCH", body: JSON.stringify({ checked: v.checked }) }),
     onMutate: async ({ id, checked }) => {
       const prev = await optimistic();
       setItems((items) => items.map((i) => (i.id === id ? { ...i, checked } : i)));
@@ -108,8 +116,9 @@ export function useShoppingActions() {
   });
 
   const moveMutation = useMutation({
+    ...offline,
     mutationFn: (v: { id: string; position: string; prev: ShoppingItem[] }) =>
-      api(`/shopping/${v.id}`, { method: "PATCH", body: JSON.stringify({ position: v.position }) }),
+      sendOrQueue(`/shopping/${v.id}`, { method: "PATCH", body: JSON.stringify({ position: v.position }) }),
     onError: (_e, v) => qc.setQueryData(ITEMS_KEY, v.prev),
     onSettled: settle,
   });
@@ -123,7 +132,8 @@ export function useShoppingActions() {
   };
 
   const remove = useMutation({
-    mutationFn: (item: ShoppingItem) => api(`/shopping/${item.id}`, { method: "DELETE" }),
+    ...offline,
+    mutationFn: (item: ShoppingItem) => sendOrQueue(`/shopping/${item.id}`, { method: "DELETE" }),
     onMutate: async (item) => {
       const prev = await optimistic();
       setItems((items) => items.filter((i) => i.id !== item.id));
@@ -134,7 +144,8 @@ export function useShoppingActions() {
   });
 
   const restore = useMutation({
-    mutationFn: (item: ShoppingItem) => api("/shopping", { method: "POST", body: JSON.stringify({ restore: item }) }),
+    ...offline,
+    mutationFn: (item: ShoppingItem) => sendOrQueue("/shopping", { method: "POST", body: JSON.stringify({ restore: item }) }),
     onMutate: async (item) => {
       const prev = await optimistic();
       setItems((items) => [...items.filter((i) => i.id !== item.id), item]);
@@ -145,7 +156,8 @@ export function useShoppingActions() {
   });
 
   const clearChecked = useMutation({
-    mutationFn: () => api("/shopping/checked", { method: "DELETE" }),
+    ...offline,
+    mutationFn: () => sendOrQueue("/shopping/checked", { method: "DELETE" }),
     onMutate: async () => {
       const prev = await optimistic();
       setItems((items) => items.filter((i) => !i.checked));

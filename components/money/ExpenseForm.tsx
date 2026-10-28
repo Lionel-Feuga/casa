@@ -130,13 +130,13 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
         )}
 
         {expense && (
-          <button type="button" className="linkbtn" onClick={() => setConfirmDelete(true)}>
+          <button type="button" className="linkbtn" data-online-only onClick={() => setConfirmDelete(true)}>
             Supprimer cette dépense
           </button>
         )}
 
         <div className="save solo">
-          <button type="submit" className="btn go" disabled={saveExpense.isPending}>
+          <button type="submit" className="btn go" data-online-only disabled={saveExpense.isPending}>
             Enregistrer
           </button>
         </div>

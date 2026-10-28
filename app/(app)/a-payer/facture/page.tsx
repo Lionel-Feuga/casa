@@ -124,12 +124,12 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
           </p>
         )}
         {bill && (
-          <button type="button" className="linkbtn" onClick={() => setConfirmDelete(true)}>
+          <button type="button" className="linkbtn" data-online-only onClick={() => setConfirmDelete(true)}>
             Supprimer cette facture
           </button>
         )}
         <div className="save solo">
-          <button type="submit" className="btn go" disabled={saveBill.isPending}>
+          <button type="submit" className="btn go" data-online-only disabled={saveBill.isPending}>
             Enregistrer
           </button>
         </div>

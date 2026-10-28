@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { InstallHint } from "@/components/InstallHint";
 import { useSession } from "@/components/Providers";
 import { api, ApiError, setToken } from "@/lib/client/api";
 
@@ -95,6 +96,7 @@ export default function CodePage() {
     <div className="app">
       <div className="deco" aria-hidden="true" />
       <main className="code">
+        <InstallHint />
         <h1 className="ttl">Code de la maison</h1>
         <p>Entre le code commun pour ouvrir Casa sur ce téléphone.</p>
         <div key={shake} className={`dots${shake ? " shake" : ""}`} aria-label={`${digits.length} chiffres sur 6`} role="img">

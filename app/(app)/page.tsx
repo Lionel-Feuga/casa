@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { Icon } from "@/components/Icon";
+import { InstallHint } from "@/components/InstallHint";
 import { Screen } from "@/components/Screen";
 import { AddBar } from "@/components/shopping/AddBar";
 import { ShoppingList } from "@/components/shopping/ShoppingList";
@@ -45,6 +46,7 @@ export default function CoursesPage() {
 
   return (
     <Screen title="Courses">
+      <InstallHint />
       <AddBar
         items={items}
         history={history}

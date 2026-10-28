@@ -29,7 +29,7 @@ function LimitRow({ category, mode, limitCents }: { category: Category; mode: Bu
   };
 
   return (
-    <li className="lrow">
+    <li className="lrow" data-online-only>
       <span className="eico">
         <CategoryIcon category={category} size={18} />
       </span>

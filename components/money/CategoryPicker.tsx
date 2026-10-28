@@ -50,7 +50,7 @@ export function CategoryPicker({ value, onChange }: { value: string | null; onCh
             maxLength={30}
             autoFocus
           />
-          <button type="button" className="btn" onClick={create} disabled={createCategory.isPending || !name.trim()}>
+          <button type="button" className="btn" data-online-only onClick={create} disabled={createCategory.isPending || !name.trim()}>
             Créer
           </button>
         </div>

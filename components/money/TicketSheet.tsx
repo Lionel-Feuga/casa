@@ -91,7 +91,7 @@ export function TicketSheet({ onClose }: { onClose: () => void }) {
         <button type="button" className="btn" onClick={onClose}>
           Pas maintenant
         </button>
-        <button type="button" className="btn go" onClick={save} disabled={saveExpense.isPending}>
+        <button type="button" className="btn go" data-online-only onClick={save} disabled={saveExpense.isPending}>
           Enregistrer
         </button>
       </div>

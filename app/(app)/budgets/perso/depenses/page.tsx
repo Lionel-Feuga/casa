@@ -48,7 +48,7 @@ function PersonalExpenses() {
           })}
         </ul>
       )}
-      <Link href="/comptes/nouvelle?pour=moi" className="fab light">
+      <Link href="/comptes/nouvelle?pour=moi" className="fab light" data-online-only>
         + Dépense
       </Link>
     </Screen>

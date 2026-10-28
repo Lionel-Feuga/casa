@@ -5,6 +5,7 @@
 @import "../styles/budgets.css";
 @import "../styles/bills.css";
 @import "../styles/tasks.css";
+@import "../styles/offline.css";
 
 *,
 *::before,

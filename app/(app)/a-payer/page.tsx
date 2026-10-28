@@ -41,7 +41,7 @@ function BillRow({ bill, today, onPay }: { bill: Bill; today: Day; onPay: (b: Bi
       </button>
       <span className="side">
         <b>{formatEuros(bill.amountCents)}</b>
-        <button type="button" className="pay" onClick={() => onPay(bill)}>
+        <button type="button" className="pay" data-online-only onClick={() => onPay(bill)}>
           Marquer payé
         </button>
       </span>
@@ -121,7 +121,7 @@ export default function APayerPage() {
         </>
       )}
 
-      <Link href="/a-payer/facture" className="fab">
+      <Link href="/a-payer/facture" className="fab" data-online-only>
         <Plus size={20} strokeWidth={2.6} aria-hidden="true" />
         Ajouter
       </Link>

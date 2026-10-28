@@ -104,7 +104,7 @@ export function TaskSheet({
           <button type="button" className="btn" onClick={onClose}>
             Annuler
           </button>
-          <button type="submit" className="btn go">
+          <button type="submit" className="btn go" data-online-only>
             {task ? "Enregistrer" : "Ajouter"}
           </button>
         </div>

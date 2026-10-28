@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSession } from "@/components/Providers";
+import { OfflineSync } from "@/components/OfflineSync";
 import { RealtimeProvider } from "@/components/Realtime";
 import { TabBar } from "@/components/TabBar";
 
@@ -24,6 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <RealtimeProvider profile={profile}>
+      <OfflineSync />
       {fullScreen ? (
         children
       ) : (
