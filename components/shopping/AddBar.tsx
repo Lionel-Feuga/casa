@@ -77,6 +77,7 @@ export function AddBar({
     <>
       <form
         className="add"
+        data-keep-keyboard
         onSubmit={(e) => {
           e.preventDefault();
           submit(value);

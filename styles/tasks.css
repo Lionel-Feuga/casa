@@ -32,3 +32,30 @@
   text-align: center;
   margin-top: 4px;
 }
+.addbtn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 4px 14px;
+  background: var(--wh);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-lg);
+  box-shadow: 4px 4px 0 var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
+}
+.addbtn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--ink);
+}
+.addbtn:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}

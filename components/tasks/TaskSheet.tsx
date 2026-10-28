@@ -11,19 +11,17 @@ import { TASK_TITLE_MAX, type Assignee } from "@/lib/domain/tasks";
 // Ajout ou modification d'une tâche (section 7) : titre, pour qui, date facultative.
 export function TaskSheet({
   task,
-  initialTitle = "",
   onSave,
   onDelete,
   onClose,
 }: {
   task?: Task;
-  initialTitle?: string;
   onSave: (input: TaskInput) => void;
   onDelete?: () => void;
   onClose: () => void;
 }) {
   const { profile } = useSession();
-  const [title, setTitle] = useState(task?.title ?? initialTitle);
+  const [title, setTitle] = useState(task?.title ?? "");
   const [assignee, setAssignee] = useState<Assignee>(task?.assignee ?? profile ?? "both");
   const [due, setDue] = useState(task?.dueDate ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -71,7 +69,7 @@ export function TaskSheet({
       >
         <div className="field">
           <label htmlFor="task-title">Quoi</label>
-          <input id="task-title" className="inp" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={TASK_TITLE_MAX} autoFocus={!initialTitle && !task} />
+          <input id="task-title" className="inp" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={TASK_TITLE_MAX} autoFocus={!task} enterKeyHint="done" />
         </div>
         <div className="field">
           <span>Pour qui</span>

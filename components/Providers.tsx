@@ -42,6 +42,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", onStorage);
   }, [refresh]);
 
+  // Touche de validation du clavier : ferme le clavier au lieu d'envoyer le formulaire.
+  // Exception : les champs marqués data-keep-keyboard (ajout d'articles dans Courses), pour enchaîner.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target;
+      if (e.key !== "Enter" || !(el instanceof HTMLInputElement) || el.closest("[data-keep-keyboard]")) return;
+      e.preventDefault();
+      el.blur();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const setProfile = useCallback(
     (p: Profile | null) => {
       setStoredProfile(p);

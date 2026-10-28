@@ -62,8 +62,7 @@ export default function AFairePage() {
   const { data: tasks = [], isPending } = useTasks();
   const actions = useTaskActions();
   const [filter, setFilter] = useState<TaskFilter>("all");
-  const [title, setTitle] = useState("");
-  const [sheet, setSheet] = useState<{ task?: Task; title?: string } | null>(null);
+  const [sheet, setSheet] = useState<{ task?: Task } | null>(null);
   const [now, setNow] = useState(() => new Date());
 
   // Les libellés (« fait hier », « visible encore 6 j ») et l'expiration avancent avec le temps.
@@ -88,23 +87,10 @@ export default function AFairePage() {
 
   return (
     <Screen title="À faire">
-      <form
-        className="add"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!title.trim()) return;
-          setSheet({ title: title.trim() });
-          setTitle("");
-        }}
-      >
+      <button type="button" className="add addbtn" onClick={() => setSheet({})}>
         <Icon name="plus" />
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ajouter une tâche…" aria-label="Ajouter une tâche" enterKeyHint="next" maxLength={80} />
-        {title.trim() && (
-          <button type="submit" className="ok">
-            Suite
-          </button>
-        )}
-      </form>
+        <span>Ajouter une tâche</span>
+      </button>
 
       <div className="chips" role="group" aria-label="Filtrer">
         {FILTERS.map((f) => (
@@ -129,7 +115,6 @@ export default function AFairePage() {
       {sheet && (
         <TaskSheet
           task={sheet.task}
-          initialTitle={sheet.title}
           onSave={(input) => (sheet.task ? actions.edit(sheet.task.id, input) : actions.add(input))}
           onDelete={sheet.task ? () => actions.remove(sheet.task!.id) : undefined}
           onClose={() => setSheet(null)}

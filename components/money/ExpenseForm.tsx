@@ -61,7 +61,7 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
             placeholder="0,00"
             aria-label="Montant en euros"
             autoFocus={!expense}
-            enterKeyHint="next"
+            enterKeyHint="done"
           />
           <span aria-hidden="true">€</span>
         </label>
