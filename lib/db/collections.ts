@@ -132,3 +132,21 @@ export interface BillDoc {
 export async function bills(): Promise<Collection<BillDoc>> {
   return (await getDb()).collection<BillDoc>("bills");
 }
+
+export interface TaskDoc {
+  _id: ObjectId;
+  title: string;
+  assignee: Profile | "both";
+  dueDate?: Date;
+  done: boolean;
+  doneAt?: Date;
+  doneBy?: Profile;
+  /** Index TTL : la tâche faite disparaît 7 jours après. */
+  expireAt?: Date;
+  createdBy: Profile;
+  createdAt: Date;
+}
+
+export async function tasks(): Promise<Collection<TaskDoc>> {
+  return (await getDb()).collection<TaskDoc>("tasks");
+}

@@ -1,0 +1,34 @@
+/* ============ À faire (section 7) ============ */
+.it .nm .tt {
+  position: relative;
+  display: inline-block;
+}
+.it .nm small {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+.it .nm small.late {
+  opacity: 1;
+  font-weight: 800;
+  color: var(--ink);
+}
+.it .nm small.late::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: var(--pk);
+  border: 1.5px solid var(--ink);
+  vertical-align: 0;
+}
+.who.w-LJ {
+  background: linear-gradient(90deg, var(--bl) 50%, var(--pk) 50%);
+}
+.hint {
+  text-align: center;
+  margin-top: 4px;
+}
