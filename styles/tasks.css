@@ -59,3 +59,91 @@
   outline: 3px solid var(--bl);
   outline-offset: 2px;
 }
+
+/* Catégories de tâches */
+.todo-actions {
+  display: flex;
+  gap: 8px;
+}
+.todo-actions .addbtn {
+  flex: 1;
+  min-width: 0;
+}
+.catbtn {
+  min-height: 50px;
+  font-size: 14px;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.grp {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 6px;
+}
+.grp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.grp-tools {
+  display: flex;
+  gap: 6px;
+}
+.mini {
+  all: unset;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 2px solid var(--ink);
+  background: var(--wh);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.mini:active {
+  translate: 2px 2px;
+  box-shadow: 0 0 0 var(--ink);
+}
+.mini:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.items.drop {
+  min-height: 12px;
+  border-radius: var(--r);
+  transition: background-color 0.15s;
+}
+.items.drop.over {
+  background: rgba(255, 255, 255, 0.35);
+}
+.drop-hint {
+  list-style: none;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  border: var(--line) dashed var(--ink);
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.6;
+}
+.it .edit {
+  all: unset;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  margin: -6px -6px -6px 0;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 10px;
+  opacity: 0.7;
+}
+.it .edit:focus-visible {
+  outline: 3px solid var(--bl);
+}
+.it .edit:active {
+  background: var(--soft);
+}

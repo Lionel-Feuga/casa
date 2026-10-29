@@ -14,5 +14,7 @@ export async function ensureIndexes(db: Db): Promise<void> {
   await expenses.createIndex({ scope: 1, date: -1 });
   await db.collection("budgets").createIndex({ categoryId: 1, view: 1 }, { unique: true });
   await db.collection("tasks").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
+  await db.collection("tasks").createIndex({ categoryId: 1, position: 1 });
+  await db.collection("task_categories").createIndex({ position: 1 });
   await db.collection("bills").createIndex({ dueDate: 1 });
 }

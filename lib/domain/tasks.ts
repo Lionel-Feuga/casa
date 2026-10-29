@@ -17,8 +17,21 @@ export interface Task {
   doneAt?: string;
   doneBy?: Profile;
   expireAt?: string;
+  /** Catégorie de tâches, absente pour « Sans catégorie ». */
+  categoryId?: string;
+  /** Ordre choisi à la main dans la catégorie (index fractionnaire, comme les courses). */
+  position: string;
   createdAt: string;
 }
+
+export interface TaskCategory {
+  id: string;
+  name: string;
+  position: string;
+}
+
+export const TASK_CATEGORY_NAME_MAX = 30;
+export const NO_CATEGORY = "none";
 
 export type TaskFilter = "all" | Assignee;
 
@@ -28,25 +41,34 @@ const daysBetween = (from: Day, to: Day) => Math.round((dayToDate(to).getTime() 
 /** Une tâche faite reste visible 7 jours : elle disparaît dès expireAt, même si l'index TTL n'est pas encore passé. */
 export const isVisible = (t: Task, now: Date): boolean => !t.done || !t.expireAt || new Date(t.expireAt) > now;
 
-export interface TaskSections {
-  week: Task[];
-  later: Task[];
-  whenever: Task[];
-  done: Task[];
+export interface TaskGroup {
+  /** Identifiant de la catégorie, ou NO_CATEGORY pour « Sans catégorie ». */
+  id: string;
+  name: string;
+  tone: "pk" | "bl" | "tl" | "ink";
+  tasks: Task[];
 }
 
-/** « Cette semaine » : date dans les 7 prochains jours ou en retard ; « Plus tard » : au-delà ; « Quand on peut » : sans date. */
-export function taskSections(tasks: Task[], filter: TaskFilter, now: Date): TaskSections {
-  const today = dayInParis(now);
+const TONES = ["pk", "bl", "tl"] as const;
+const byPosition = <T extends { position: string; id: string }>(a: T, b: T) =>
+  a.position !== b.position ? (a.position < b.position ? -1 : 1) : a.id < b.id ? -1 : 1;
+
+/**
+ * Tâches rangées par catégorie, dans l'ordre choisi à la main ; « Sans catégorie » en dernier.
+ * Dans chaque catégorie, les tâches faites (visibles 7 jours) passent sous les autres.
+ */
+export function groupTasks(tasks: Task[], categories: TaskCategory[], filter: TaskFilter, now: Date): TaskGroup[] {
+  const known = new Set(categories.map((c) => c.id));
   const list = tasks.filter((t) => isVisible(t, now) && (filter === "all" || t.assignee === filter));
-  const byDue = (a: Task, b: Task) => (a.dueDate! < b.dueDate! ? -1 : a.dueDate! > b.dueDate! ? 1 : a.createdAt < b.createdAt ? -1 : 1);
-  const todo = list.filter((t) => !t.done);
-  return {
-    week: todo.filter((t) => t.dueDate && daysBetween(today, t.dueDate) <= 7).sort(byDue),
-    later: todo.filter((t) => t.dueDate && daysBetween(today, t.dueDate) > 7).sort(byDue),
-    whenever: todo.filter((t) => !t.dueDate).sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)),
-    done: list.filter((t) => t.done).sort((a, b) => ((a.doneAt ?? "") < (b.doneAt ?? "") ? 1 : -1)),
+  const inGroup = (id: string) => {
+    const mine = list.filter((t) => (id === NO_CATEGORY ? !t.categoryId || !known.has(t.categoryId) : t.categoryId === id));
+    return [...mine.filter((t) => !t.done).sort(byPosition), ...mine.filter((t) => t.done).sort(byPosition)];
   };
+  const groups: TaskGroup[] = [...categories].sort(byPosition).map((c, i) => ({ id: c.id, name: c.name, tone: TONES[i % TONES.length], tasks: inGroup(c.id) }));
+  const loose = inGroup(NO_CATEGORY);
+  // « Sans catégorie » n'apparaît que s'il contient des tâches, ou s'il n'y a encore aucune catégorie.
+  if (loose.length || groups.length === 0) groups.push({ id: NO_CATEGORY, name: "Sans catégorie", tone: "ink", tasks: loose });
+  return groups;
 }
 
 const WEEKDAYS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];

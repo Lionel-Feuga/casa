@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { DONE_VISIBLE_MS, doneLabel, dueLabel, isLate, isVisible, taskSections, type Task } from "./tasks";
+import { DONE_VISIBLE_MS, doneLabel, dueLabel, groupTasks, isLate, isVisible, NO_CATEGORY, type Task, type TaskCategory } from "./tasks";
 
 const now = new Date("2026-10-26T10:00:00Z"); // lundi 26 octobre, Paris
-const task = (id: string, extra: Partial<Task> = {}): Task => ({ id, title: id, assignee: "both", done: false, createdAt: `2026-10-01T00:00:0${id.length % 10}Z`, ...extra });
+const task = (id: string, extra: Partial<Task> = {}): Task => ({ id, title: id, assignee: "both", done: false, position: "a0", createdAt: `2026-10-01T00:00:0${id.length % 10}Z`, ...extra });
 const doneAt = (iso: string, by: Task["doneBy"] = "jaz"): Partial<Task> => ({
   done: true,
   doneAt: iso,
@@ -10,27 +10,35 @@ const doneAt = (iso: string, by: Task["doneBy"] = "jaz"): Partial<Task> => ({
   expireAt: new Date(new Date(iso).getTime() + DONE_VISIBLE_MS).toISOString(),
 });
 
-describe("sections", () => {
+describe("catégories", () => {
+  const cats: TaskCategory[] = [
+    { id: "bricolage", name: "Bricolage", position: "a1" },
+    { id: "menage", name: "Ménage", position: "a0" },
+  ];
   const tasks = [
-    task("verre", { dueDate: "2026-10-29", assignee: "lionel" }),
-    task("syndic", { dueDate: "2026-10-20", assignee: "jaz" }),
-    task("etagere", { dueDate: "2026-11-02" }),
-    task("cave", { dueDate: "2026-11-15" }),
-    task("ampoule", { assignee: "lionel" }),
-    task("plantes", doneAt("2026-10-25T18:00:00Z")),
+    task("verre", { categoryId: "menage", position: "a1", assignee: "lionel" }),
+    task("poubelles", { categoryId: "menage", position: "a0", assignee: "jaz" }),
+    task("plantes", { categoryId: "menage", position: "Zz", ...doneAt("2026-10-25T18:00:00Z") }),
+    task("etagere", { categoryId: "bricolage", position: "a0" }),
+    task("syndic", { position: "a0", assignee: "jaz" }),
+    task("perdue", { categoryId: "supprimee", position: "a1" }),
   ];
 
-  it("cette semaine (retards compris), plus tard, quand on peut, fait", () => {
-    const s = taskSections(tasks, "all", now);
-    expect(s.week.map((t) => t.id)).toEqual(["syndic", "verre", "etagere"]);
-    expect(s.later.map((t) => t.id)).toEqual(["cave"]);
-    expect(s.whenever.map((t) => t.id)).toEqual(["ampoule"]);
-    expect(s.done.map((t) => t.id)).toEqual(["plantes"]);
+  it("rangées par catégorie et à la main, les faites en bas, Sans catégorie en dernier", () => {
+    const g = groupTasks(tasks, cats, "all", now);
+    expect(g.map((x) => x.name)).toEqual(["Ménage", "Bricolage", "Sans catégorie"]);
+    expect(g[0].tasks.map((t) => t.id)).toEqual(["poubelles", "verre", "plantes"]);
+    expect(g[2]).toMatchObject({ id: NO_CATEGORY, tone: "ink" });
+    expect(g[2].tasks.map((t) => t.id)).toEqual(["syndic", "perdue"]);
   });
-  it("filtres Lionel, Jaz, Les deux", () => {
-    expect(Object.values(taskSections(tasks, "lionel", now)).flat().map((t) => t.id)).toEqual(["verre", "ampoule"]);
-    expect(Object.values(taskSections(tasks, "jaz", now)).flat().map((t) => t.id)).toEqual(["syndic"]);
-    expect(taskSections(tasks, "both", now).week.map((t) => t.id)).toEqual(["etagere"]);
+  it("filtres Lionel, Jaz, Les deux ; une catégorie vide reste affichée", () => {
+    const jaz = groupTasks(tasks, cats, "jaz", now);
+    expect(jaz.map((x) => x.tasks.map((t) => t.id))).toEqual([["poubelles"], [], ["syndic"]]);
+    const lionel = groupTasks(tasks, cats, "lionel", now);
+    expect(lionel.map((x) => x.name)).toEqual(["Ménage", "Bricolage"]);
+  });
+  it("sans aucune catégorie, un seul bloc", () => {
+    expect(groupTasks([], [], "all", now).map((x) => x.name)).toEqual(["Sans catégorie"]);
   });
 });
 

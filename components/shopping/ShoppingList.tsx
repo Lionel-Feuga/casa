@@ -27,7 +27,7 @@ const onHandle = (target: EventTarget | null) => target instanceof Element && !!
  * Section 3.4 : appui long (~250 ms) sur l'article, ou glisser tout de suite depuis la poignée.
  * Le capteur choisit sa contrainte selon l'endroit touché.
  */
-class CasaTouchSensor extends TouchSensor {
+export class CasaTouchSensor extends TouchSensor {
   constructor(props: ConstructorParameters<typeof TouchSensor>[0]) {
     const options: TouchSensorOptions = {
       ...props.options,
@@ -37,7 +37,7 @@ class CasaTouchSensor extends TouchSensor {
   }
 }
 
-class CasaMouseSensor extends MouseSensor {
+export class CasaMouseSensor extends MouseSensor {
   constructor(props: ConstructorParameters<typeof MouseSensor>[0]) {
     const options: MouseSensorOptions = {
       ...props.options,
@@ -48,13 +48,13 @@ class CasaMouseSensor extends MouseSensor {
 }
 
 // Au lâcher, l'article soulevé se pose sur sa nouvelle place ; l'emplacement reste caché pendant ce temps.
-const dropAnimation: DropAnimation = {
+export const dropAnimation: DropAnimation = {
   duration: 180,
   easing: "cubic-bezier(.3,1.3,.5,1)",
   sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: "0" } } }),
 };
 
-const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+export const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 
 export function ShoppingList({
   items: incoming,

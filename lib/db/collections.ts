@@ -143,8 +143,22 @@ export interface TaskDoc {
   doneBy?: Profile;
   /** Index TTL : la tâche faite disparaît 7 jours après. */
   expireAt?: Date;
+  categoryId?: ObjectId;
+  /** Ordre dans la catégorie (index fractionnaire). Absent sur les tâches créées avant les catégories. */
+  position?: string;
   createdBy: Profile;
   createdAt: Date;
+}
+
+export interface TaskCategoryDoc {
+  _id: ObjectId;
+  name: string;
+  position: string;
+  createdAt: Date;
+}
+
+export async function taskCategories(): Promise<Collection<TaskCategoryDoc>> {
+  return (await getDb()).collection<TaskCategoryDoc>("task_categories");
 }
 
 export async function tasks(): Promise<Collection<TaskDoc>> {
