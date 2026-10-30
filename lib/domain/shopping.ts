@@ -49,10 +49,18 @@ export function findDuplicate(items: ShoppingItem[], name: string): ShoppingItem
   return same.find((i) => !i.checked) ?? same[0];
 }
 
-/** Position d'un article ajouté en bas de la liste. */
+/**
+ * Position d'un article ajouté : en bas de la liste, mais au-dessus des articles barrés qui la terminent
+ * (juste après le dernier article non coché).
+ */
 export function positionAtEnd(items: ShoppingItem[]): string {
-  const last = sortItems(items).at(-1);
-  return generateKeyBetween(last?.position ?? null, null);
+  const sorted = sortItems(items);
+  let i = sorted.length;
+  while (i > 0 && sorted[i - 1].checked) i--;
+  const before = sorted[i - 1]?.position ?? null;
+  const after = sorted[i]?.position ?? null;
+  if (before !== null && after !== null && before >= after) return generateKeyBetween(before, null);
+  return generateKeyBetween(before, after);
 }
 
 /**

@@ -48,6 +48,13 @@ describe("positions", () => {
     expect(p > "a1").toBe(true);
     expect(positionAtEnd([])).toBeTruthy();
   });
+  it("ajoute au-dessus des articles barrés qui terminent la liste", () => {
+    const items = [item("a", "A", "a0"), item("b", "B", "a1", true), item("c", "C", "a2"), item("d", "D", "a3", true), item("e", "E", "a4", true)];
+    const p = positionAtEnd(items);
+    expect(p > "a2" && p < "a3").toBe(true);
+    // tout est barré : en tête de liste
+    expect(positionAtEnd([item("x", "X", "a0", true)]) < "a0").toBe(true);
+  });
   it("déplace un article entre ses nouveaux voisins", () => {
     const sorted = sortItems([item("a", "A", "a0"), item("b", "B", "a1"), item("c", "C", "a2"), item("d", "D", "a3")]);
     // D (index 3) en tête
