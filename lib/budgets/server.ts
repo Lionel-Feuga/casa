@@ -4,6 +4,7 @@ import { computeBudget, type BudgetLine, type BudgetView } from "@/lib/domain/bu
 import { monthRange, type Month } from "@/lib/domain/dates";
 import type { Profile } from "@/lib/domain/profile";
 import { listCategories, visibleTo } from "@/lib/money/server";
+import { settleAutoPay } from "@/lib/bills/autopay";
 import { publishChange } from "@/lib/realtime/server";
 
 export interface BudgetMonth {
@@ -18,6 +19,7 @@ export interface BudgetMonth {
 /** Budgets d'un mois pour une vue (section 6.2). La vue perso est toujours celle du profil qui demande. */
 export async function getBudgetMonth(month: Month, view: BudgetView, viewer: Profile): Promise<BudgetMonth> {
   if (view !== "shared" && view !== viewer) throw new Error("Vue perso d'un autre profil");
+  await settleAutoPay();
   const { start, end } = monthRange(month);
   const [cats, docs, limits] = await Promise.all([
     listCategories(),

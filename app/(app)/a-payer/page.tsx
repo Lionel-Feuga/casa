@@ -9,7 +9,7 @@ import { Screen } from "@/components/Screen";
 import { useMonthExpenses } from "@/lib/client/budgets";
 import { useBills, type Bill } from "@/lib/client/bills";
 import { billSections, isOverdue, kindLabel } from "@/lib/domain/bills";
-import { addMonths, currentMonth, dayInParis, monthLabel, type Day } from "@/lib/domain/dates";
+import { addMonths, currentMonth, dayInParis, monthLabel, shortDay, type Day } from "@/lib/domain/dates";
 import { formatEuros } from "@/lib/domain/money";
 
 const MONTHS_SHORT = ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"];
@@ -41,9 +41,14 @@ function BillRow({ bill, today, onPay }: { bill: Bill; today: Day; onPay: (b: Bi
       </button>
       <span className="side">
         <b>{formatEuros(bill.amountCents)}</b>
-        <button type="button" className="pay" data-online-only onClick={() => onPay(bill)}>
-          Marquer payé
-        </button>
+        {bill.autoPay ? (
+          // Prélèvement : payée toute seule à l'échéance, rien à cliquer.
+          <span className="pay auto">Prélevé le {shortDay(bill.dueDate)}</span>
+        ) : (
+          <button type="button" className="pay" data-online-only onClick={() => onPay(bill)}>
+            Marquer payé
+          </button>
+        )}
       </span>
     </li>
   );
@@ -105,6 +110,7 @@ export default function APayerPage() {
                     <b>{e.label}</b>
                     <small>
                       {e.scope === "personal" && <span className="tag perso">Perso</span>}
+                      {e.auto && <span className="tag">Prélèvement</span>}
                       <span className="tag">
                         {e.paidBy === "both" ? "payé par les deux" : `payé par ${e.paidBy === "lionel" ? "Lionel" : "Jaz"}`}
                       </span>

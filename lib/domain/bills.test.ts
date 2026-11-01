@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { billSections, isOverdue, nextDueDate, type Bill } from "./bills";
+import { autoPayments, billSections, isOverdue, nextDueDate, type Bill } from "./bills";
 
 const bill = (id: string, dueDate: string, amountCents: number, extra: Partial<Bill> = {}): Bill => ({
   id,
@@ -54,5 +54,28 @@ describe("sections et reste à payer", () => {
     expect(isOverdue(bills[3], today)).toBe(true);
     expect(isOverdue(bills[0], today)).toBe(false);
     expect(isOverdue(bills[6], today)).toBe(false);
+  });
+});
+
+describe("prélèvement automatique", () => {
+  it("rien avant l'échéance", () => {
+    expect(autoPayments(bill("loyer", "2026-11-05", 80000), "2026-11-04")).toEqual({ dates: [], nextDue: "2026-11-05", paid: false });
+  });
+  it("le jour de l'échéance : payée, échéance suivante", () => {
+    expect(autoPayments(bill("loyer", "2026-11-05", 80000), "2026-11-05")).toEqual({ dates: ["2026-11-05"], nextDue: "2026-12-05", paid: false });
+  });
+  it("rattrape les mois manqués, en gardant le jour d'origine", () => {
+    const b = bill("tel", "2027-01-31", 2000);
+    expect(autoPayments(b, "2027-03-31")).toEqual({ dates: ["2027-01-31", "2027-02-28", "2027-03-31"], nextDue: "2027-04-30", paid: false });
+  });
+  it("ponctuelle : payée une fois", () => {
+    expect(autoPayments(bill("taxe", "2026-10-15", 50000, { kind: "once", every: undefined }), "2026-11-01")).toEqual({
+      dates: ["2026-10-15"],
+      nextDue: "2026-10-15",
+      paid: true,
+    });
+  });
+  it("une facture en prélèvement n'est jamais en retard", () => {
+    expect(isOverdue({ dueDate: "2026-10-01", paid: false, autoPay: true }, "2026-11-01")).toBe(false);
   });
 });

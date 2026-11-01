@@ -9,7 +9,7 @@ import { Segmented } from "@/components/money/Segmented";
 import { useBill, useBillActions, type Bill } from "@/lib/client/bills";
 import { useCategories } from "@/lib/client/money";
 import { dayInParis, isDay } from "@/lib/domain/dates";
-import { centsToInput, parseAmount } from "@/lib/domain/money";
+import { centsToInput, parseAmount, type Payer } from "@/lib/domain/money";
 
 type Freq = "month" | "year" | "once";
 
@@ -23,6 +23,8 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
   const [due, setDue] = useState(bill?.dueDate ?? dayInParis());
   const [freq, setFreq] = useState<Freq>(bill ? (bill.kind === "once" ? "once" : (bill.every ?? "month")) : "month");
   const [scope, setScope] = useState<"shared" | "personal">(bill?.scope ?? "shared");
+  const [autoPay, setAutoPay] = useState<"auto" | "manual">(bill?.autoPay ? "auto" : "manual");
+  const [autoPaidBy, setAutoPaidBy] = useState<Payer>(bill?.autoPaidBy ?? "both");
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -49,6 +51,8 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
           kind: freq === "once" ? "once" : "recurring",
           every: freq === "once" ? undefined : freq,
           dueDate: due,
+          autoPay: autoPay === "auto",
+          autoPaidBy: autoPay === "auto" && scope === "shared" ? autoPaidBy : undefined,
         },
       },
       { onSuccess: onDone, onError: () => setError("Impossible d’enregistrer. Vérifie le réseau.") },
@@ -113,6 +117,38 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
             ]}
           />
         </div>
+        <div className="field">
+          <span>Paiement</span>
+          <Segmented
+            label="Paiement"
+            value={autoPay}
+            onChange={setAutoPay}
+            options={[
+              { value: "manual", label: "Je paie moi-même" },
+              { value: "auto", label: "Prélèvement auto" },
+            ]}
+          />
+        </div>
+        {autoPay === "auto" && scope === "shared" && (
+          <div className="field">
+            <span>Prélevé sur le compte de</span>
+            <Segmented<Payer>
+              label="Prélevé sur le compte de"
+              value={autoPaidBy}
+              onChange={setAutoPaidBy}
+              options={[
+                { value: "lionel", label: "Lionel" },
+                { value: "jaz", label: "Jaz" },
+                { value: "both", label: "Les deux" },
+              ]}
+            />
+          </div>
+        )}
+        {autoPay === "auto" && (
+          <p className="calc">
+            Payée toute seule à chaque échéance, sans « Marquer payé ». Si l’échéance est déjà passée, le paiement est enregistré à sa date.
+          </p>
+        )}
         <p className="calc">
           {scope === "shared"
             ? "Commune : visible par vous deux. Une fois payée, elle devient une dépense commune."

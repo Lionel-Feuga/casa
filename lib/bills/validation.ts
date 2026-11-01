@@ -16,6 +16,8 @@ export const BillBody = z.object({
   kind: z.enum(["recurring", "once"]),
   every: z.enum(["month", "year"]).optional(),
   dueDate: day,
+  autoPay: z.boolean().optional(),
+  autoPaidBy: z.enum([...PROFILES, "both"]).optional(),
 });
 
 // Feuille « Marquer payé » (section 8.2)

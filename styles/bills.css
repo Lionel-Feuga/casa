@@ -172,3 +172,9 @@
   box-shadow: none;
   cursor: default;
 }
+.pay.auto {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  cursor: default;
+}

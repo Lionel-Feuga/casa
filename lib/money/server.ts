@@ -7,6 +7,7 @@ import { dateToDay, dayInParis, dayToDate, monthRange, type Day, type Month } fr
 import { computeBalance, settlementFor, type Payer, type Scope } from "@/lib/domain/money";
 import { normalizeName } from "@/lib/domain/normalize";
 import type { Profile } from "@/lib/domain/profile";
+import { settleAutoPay } from "@/lib/bills/autopay";
 import { publishChange } from "@/lib/realtime/server";
 
 // ---------- Catégories (section 4) ----------
@@ -66,6 +67,7 @@ export interface Expense {
   date: Day;
   source: ExpenseDoc["source"];
   billId?: string;
+  auto?: boolean;
   createdBy: Profile;
   createdAt: string;
 }
@@ -81,6 +83,7 @@ export const toExpense = (d: ExpenseDoc): Expense => ({
   date: dateToDay(d.date),
   source: d.source,
   billId: d.billId?.toHexString(),
+  auto: d.auto,
   createdBy: d.createdBy,
   createdAt: d.createdAt.toISOString(),
 });
@@ -114,6 +117,7 @@ function fieldsFrom(input: ExpenseInput, by: Profile) {
 }
 
 export async function listExpenses(viewer: Profile, opts: { month?: Month; scope?: Scope }): Promise<Expense[]> {
+  await settleAutoPay();
   const byScope: Filter<ExpenseDoc> =
     opts.scope === "shared" ? { scope: "shared" } : opts.scope === "personal" ? { scope: "personal", owner: viewer } : visibleTo(viewer);
   const range = opts.month ? monthRange(opts.month) : null;
@@ -200,6 +204,7 @@ export interface BalanceView {
 }
 
 export async function getBalance(): Promise<BalanceView> {
+  await settleAutoPay();
   const shared = await (await expenses())
     .find({ scope: "shared" }, { projection: { amountCents: 1, scope: 1, paidBy: 1, createdAt: 1 } })
     .toArray();

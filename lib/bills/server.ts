@@ -7,6 +7,7 @@ import type { Profile } from "@/lib/domain/profile";
 import { cleanName } from "@/lib/domain/shopping";
 import { toExpense, type Expense } from "@/lib/money/server";
 import { publishChange } from "@/lib/realtime/server";
+import { settleAutoPay } from "./autopay";
 
 const toBill = (d: BillDoc): Bill => ({
   id: d._id.toHexString(),
@@ -20,6 +21,8 @@ const toBill = (d: BillDoc): Bill => ({
   dueDate: dateToDay(d.dueDate),
   dayOfMonth: d.dayOfMonth,
   paid: d.paid,
+  autoPay: d.autoPay,
+  autoPaidBy: d.autoPaidBy,
 });
 
 /** Une facture perso n'est visible que par son propriétaire (section 8.1). */
@@ -33,6 +36,8 @@ export interface BillInput {
   kind: BillKind;
   every?: BillEvery;
   dueDate: Day;
+  autoPay?: boolean;
+  autoPaidBy?: Payer;
 }
 
 function fieldsFrom(input: BillInput, by: Profile) {
@@ -44,12 +49,15 @@ function fieldsFrom(input: BillInput, by: Profile) {
     kind: input.kind,
     dueDate: dayToDate(input.dueDate),
     dayOfMonth: Number(input.dueDate.slice(8)),
+    autoPay: !!input.autoPay,
     ...(input.kind === "recurring" ? { every: input.every ?? "month" } : {}),
     ...(input.scope === "personal" ? { owner: by } : {}),
+    ...(input.autoPay && input.scope === "shared" ? { autoPaidBy: input.autoPaidBy ?? "both" } : {}),
   };
 }
 
 export async function listBills(viewer: Profile): Promise<Bill[]> {
+  await settleAutoPay();
   // Les factures ponctuelles déjà payées n'ont plus rien à afficher (elles restent visibles par leur dépense).
   const docs = await (await bills()).find({ ...visibleTo(viewer), paid: { $ne: true } }).sort({ dueDate: 1 }).toArray();
   return docs.map(toBill);
@@ -71,6 +79,7 @@ export async function updateBill(id: string, input: BillInput, by: Profile): Pro
   const unset: Record<string, ""> = {};
   if (input.kind === "once") unset.every = "";
   if (input.scope === "shared") unset.owner = "";
+  if (!input.autoPay || input.scope === "personal") unset.autoPaidBy = "";
   const doc = await (await bills()).findOneAndUpdate(
     { _id: new ObjectId(id), ...visibleTo(by) },
     { $set: fieldsFrom(input, by), ...(Object.keys(unset).length ? { $unset: unset } : {}) },

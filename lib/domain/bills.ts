@@ -1,4 +1,5 @@
 import { addMonths, monthOf, type Day, type Month } from "./dates";
+import type { Payer } from "./money";
 import type { Profile } from "./profile";
 
 // Factures (section 8). Fonctions pures.
@@ -18,6 +19,10 @@ export interface Bill {
   dueDate: Day;
   dayOfMonth: number;
   paid: boolean;
+  /** Prélèvement automatique : la facture se paie seule à son échéance. */
+  autoPay?: boolean;
+  /** Compte prélevé pour une facture commune en prélèvement. */
+  autoPaidBy?: Payer;
 }
 
 const lastDayOf = (month: Month): number => {
@@ -35,7 +40,29 @@ export function nextDueDate(due: Day, every: BillEvery, dayOfMonth: number): Day
   return dayIn(addMonths(monthOf(due), every === "year" ? 12 : 1), dayOfMonth);
 }
 
-export const isOverdue = (b: Pick<Bill, "dueDate" | "paid">, today: Day): boolean => !b.paid && b.dueDate < today;
+/** Au-delà, on arrête de rattraper les échéances passées (facture saisie avec une date très ancienne). */
+const MAX_CATCH_UP = 24;
+
+/**
+ * Prélèvement automatique : une date de paiement par échéance passée ou du jour, puis l'échéance
+ * suivante (récurrente) ou la facture payée (ponctuelle).
+ */
+export function autoPayments(
+  b: Pick<Bill, "kind" | "every" | "dueDate" | "dayOfMonth" | "paid">,
+  today: Day,
+): { dates: Day[]; nextDue: Day; paid: boolean } {
+  if (b.paid || b.dueDate > today) return { dates: [], nextDue: b.dueDate, paid: b.paid };
+  if (b.kind === "once") return { dates: [b.dueDate], nextDue: b.dueDate, paid: true };
+  const dates: Day[] = [];
+  let due = b.dueDate;
+  while (due <= today && dates.length < MAX_CATCH_UP) {
+    dates.push(due);
+    due = nextDueDate(due, b.every ?? "month", b.dayOfMonth);
+  }
+  return { dates, nextDue: due, paid: false };
+}
+
+export const isOverdue = (b: Pick<Bill, "dueDate" | "paid" | "autoPay">, today: Day): boolean => !b.paid && !b.autoPay && b.dueDate < today;
 
 export interface BillSections {
   /** Échéance au plus tard à la fin du mois en cours, retards compris. */

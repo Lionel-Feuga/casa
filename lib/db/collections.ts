@@ -79,6 +79,8 @@ export interface ExpenseDoc {
   /** Échéance de la facture avant et après ce paiement, pour la remettre si la dépense est supprimée. */
   billPrevDueDate?: Date;
   billNextDueDate?: Date;
+  /** Créée par un prélèvement automatique. */
+  auto?: boolean;
   createdBy: Profile;
   createdAt: Date;
   updatedAt: Date;
@@ -125,6 +127,8 @@ export interface BillDoc {
   dueDate: Date;
   dayOfMonth: number;
   paid: boolean;
+  autoPay?: boolean;
+  autoPaidBy?: Profile | "both";
   createdBy: Profile;
   createdAt: Date;
 }
