@@ -10,6 +10,7 @@ export const ExpenseBody = z.object({
   categoryId: z.string().regex(/^[0-9a-f]{24}$/i),
   scope: z.enum(["shared", "personal"]),
   paidBy: z.enum([...PROFILES, "both"]),
+  owner: z.enum(PROFILES).optional(),
   date: z.string().refine(isDay),
   source: z.enum(["manual", "ticket"]).optional(),
 });

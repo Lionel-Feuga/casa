@@ -5,14 +5,14 @@ import { ExpenseBody } from "@/lib/money/validation";
 
 export const dynamic = "force-dynamic";
 
-// Filtres month=AAAA-MM et scope=shared|personal. Les dépenses perso ne sont renvoyées qu'à leur propriétaire.
+// Filtres month=AAAA-MM et scope=shared|personal|ledger. Les dépenses perso ne sont renvoyées qu'à leur propriétaire.
 export const GET = withProfile(async (req, _ctx, profile) => {
   const url = new URL(req.url);
   const month = url.searchParams.get("month") ?? undefined;
   const scope = url.searchParams.get("scope") ?? undefined;
   if (month && !isMonth(month)) return json({ error: "invalid" }, 400);
-  if (scope && scope !== "shared" && scope !== "personal") return json({ error: "invalid" }, 400);
-  return json({ expenses: await listExpenses(profile, { month, scope: scope as "shared" | "personal" | undefined }) });
+  if (scope && scope !== "shared" && scope !== "personal" && scope !== "ledger") return json({ error: "invalid" }, 400);
+  return json({ expenses: await listExpenses(profile, { month, scope: scope as "shared" | "personal" | "ledger" | undefined }) });
 });
 
 export const POST = withProfile(async (req, _ctx, profile) => {

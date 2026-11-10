@@ -72,9 +72,16 @@ function MonthEntries({ month, first, onSettlement }: { month: Month; first: boo
             }
             const x = e.expense;
             const shares = splitShares(x.amountCents);
-            const other =
-              x.paidBy === "lionel" ? `part de Jaz ${formatEuros(shares.jaz)}` : x.paidBy === "jaz" ? `part de Lionel ${formatEuros(shares.lionel)}` : "chacun sa part";
-            const payer = x.paidBy === "both" ? "les deux" : PROFILE_LABEL[x.paidBy];
+            // Dépense « Juste elle / Juste lui » payée par l'autre : due en entier.
+            const forOne = x.scope === "personal" && x.owner ? x.owner : null;
+            const other = forOne
+              ? `${PROFILE_LABEL[forOne]} doit tout`
+              : x.paidBy === "lionel"
+                ? `part de Jaz ${formatEuros(shares.jaz)}`
+                : x.paidBy === "jaz"
+                  ? `part de Lionel ${formatEuros(shares.lionel)}`
+                  : "chacun sa part";
+            const payer = (x.paidBy === "both" ? "les deux" : PROFILE_LABEL[x.paidBy]) + (forOne ? `, pour ${PROFILE_LABEL[forOne]}` : "");
             return (
               <li key={x.id}>
                 <button type="button" className="er" onClick={() => router.push(`/comptes/nouvelle?id=${x.id}`)}>

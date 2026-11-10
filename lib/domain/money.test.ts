@@ -66,3 +66,25 @@ describe("aperçu du formulaire", () => {
     expect(b.replace(/ /g, " ")).toBe("Jaz devra 18,32 € à Lionel.");
   });
 });
+
+describe("Juste elle / Juste lui", () => {
+  const forJaz = (paidBy: DebtSource["paidBy"]): DebtSource => ({ amountCents: 1000, scope: "personal", paidBy, owner: "jaz" });
+  it("10 € juste pour Jaz, payée par Lionel : Jaz doit 10 € à Lionel", () => {
+    expect(debtOf(forJaz("lionel"))).toEqual({ from: "jaz", to: "lionel", amountCents: 1000 });
+    expect(computeBalance([forJaz("lionel")], []).balanceCents).toBe(1000);
+  });
+  it("juste pour Jaz, payée par Jaz : pas de dette", () => {
+    expect(debtOf(forJaz("jaz"))).toBeNull();
+  });
+  it("juste pour Lionel, payée par Jaz : Lionel doit tout", () => {
+    expect(debtOf({ amountCents: 2500, scope: "personal", paidBy: "jaz", owner: "lionel" })).toEqual({ from: "lionel", to: "jaz", amountCents: 2500 });
+  });
+  it("aperçu du formulaire vu par Lionel", () => {
+    const [a, b] = describeExpense({ amountCents: 1000, scope: "personal", paidBy: "lionel", owner: "jaz" }, "lionel");
+    expect(a).toBe("Juste pour Jaz : seulement dans son budget.");
+    expect(b.replace(/\s/g, " ")).toBe("Jaz devra 10,00 € à Lionel.");
+    expect(describeExpense({ amountCents: 1000, scope: "personal", paidBy: "lionel", owner: "lionel" }, "lionel")).toEqual([
+      "Perso : seulement dans ton budget, pas dans les Comptes.",
+    ]);
+  });
+});

@@ -1,4 +1,4 @@
-import type { Profile } from "./profile";
+import { PROFILE_LABEL, type Profile } from "./profile";
 
 // Argent (sections 5.1 à 5.3). Tous les montants sont en centimes entiers.
 
@@ -41,11 +41,21 @@ export interface DebtSource {
   amountCents: number;
   scope: Scope;
   paidBy: Payer;
+  /** Pour une dépense perso : celui ou celle pour qui elle est. */
+  owner?: Profile;
 }
 
-/** Dette créée par une dépense : qui doit combien à qui. null si aucune (perso, ou payée par les deux). */
+/**
+ * Dette créée par une dépense : qui doit combien à qui. null si aucune (perso payée par son
+ * propriétaire, ou payée par les deux). Une dépense « Juste elle / Juste lui » payée par l'autre
+ * est due en entier.
+ */
 export function debtOf(e: DebtSource): { from: Profile; to: Profile; amountCents: number } | null {
-  if (e.scope !== "shared" || e.paidBy === "both") return null;
+  if (e.paidBy === "both") return null;
+  if (e.scope === "personal") {
+    if (!e.owner || e.owner === e.paidBy) return null;
+    return { from: e.owner, to: e.paidBy, amountCents: e.amountCents };
+  }
   const shares = splitShares(e.amountCents);
   return e.paidBy === "lionel"
     ? { from: "jaz", to: "lionel", amountCents: shares.jaz }
@@ -89,8 +99,14 @@ export function settlementFor(balanceCents: number): SettlementSource | null {
 }
 
 /** Aperçu sous le formulaire de dépense (section 5.1). */
-export function describeExpense(e: { amountCents: number | null; scope: Scope; paidBy: Payer }): string[] {
-  if (e.scope === "personal") return ["Perso : seulement dans ton budget, pas dans les Comptes."];
+export function describeExpense(e: { amountCents: number | null; scope: Scope; paidBy: Payer; owner?: Profile }, me?: Profile): string[] {
+  if (e.scope === "personal") {
+    const owner = e.owner ?? me;
+    const head = !owner || owner === me ? "Perso : seulement dans ton budget" : `Juste pour ${PROFILE_LABEL[owner]} : seulement dans son budget`;
+    if (!owner || e.paidBy === owner || e.paidBy === "both") return [`${head}, pas dans les Comptes.`];
+    const amount = e.amountCents ? formatEuros(e.amountCents) : "le montant entier";
+    return [`${head}.`, `${PROFILE_LABEL[owner]} devra ${amount} à ${PROFILE_LABEL[e.paidBy]}.`];
+  }
   if (!e.amountCents) return ["Commune, partagée 60 / 40."];
   const s = splitShares(e.amountCents);
   const head = `Commune, 60 / 40 : Lionel ${formatEuros(s.lionel)} · Jaz ${formatEuros(s.jaz)}`;

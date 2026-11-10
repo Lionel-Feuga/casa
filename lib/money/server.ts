@@ -88,8 +88,13 @@ export const toExpense = (d: ExpenseDoc): Expense => ({
   createdAt: d.createdAt.toISOString(),
 });
 
-/** Une dépense perso n'est visible que par son propriétaire. */
-export const visibleTo = (viewer: Profile): Filter<ExpenseDoc> => ({ $or: [{ scope: "shared" }, { scope: "personal", owner: viewer }] });
+/** Une dépense perso est visible par son propriétaire, et par l'autre s'il l'a saisie ou payée (« Juste elle / Juste lui »). */
+export const visibleTo = (viewer: Profile): Filter<ExpenseDoc> => ({
+  $or: [{ scope: "shared" }, { scope: "personal", owner: viewer }, { scope: "personal", paidBy: viewer }, { scope: "personal", createdBy: viewer }],
+});
+
+/** Dépenses perso payées par l'autre : elles créent une dette, donc vont aussi dans les Comptes. */
+const personalDebt: Filter<ExpenseDoc> = { scope: "personal", $expr: { $ne: ["$paidBy", "$owner"] } };
 
 export interface ExpenseInput {
   label: string;
@@ -98,28 +103,38 @@ export interface ExpenseInput {
   scope: Scope;
   /** « both » seulement pour une dépense créée par une facture commune. */
   paidBy: Payer;
+  /** Dépense perso : pour qui (« Juste moi » par défaut, ou l'autre). */
+  owner?: Profile;
   date: Day;
   source?: "manual" | "ticket";
 }
 
-/** Avec « Juste moi », la dépense appartient au profil actuel, qui l'a payée. */
+/** Une dépense perso appartient au profil actuel (« Juste moi ») ou à l'autre (« Juste elle / Juste lui »). */
 function fieldsFrom(input: ExpenseInput, by: Profile) {
   const personal = input.scope === "personal";
+  const owner = input.owner ?? by;
   return {
     label: cleanName(input.label).slice(0, 60),
     amountCents: input.amountCents,
     categoryId: new ObjectId(input.categoryId),
     scope: input.scope,
-    paidBy: personal ? by : input.paidBy,
+    paidBy: personal && input.paidBy === "both" ? owner : input.paidBy,
     date: dayToDate(input.date),
-    ...(personal ? { owner: by } : {}),
+    ...(personal ? { owner } : {}),
   };
 }
 
-export async function listExpenses(viewer: Profile, opts: { month?: Month; scope?: Scope }): Promise<Expense[]> {
+/** « ledger » : ce qui compte dans les Comptes, dépenses communes et perso payées par l'autre. */
+export async function listExpenses(viewer: Profile, opts: { month?: Month; scope?: Scope | "ledger" }): Promise<Expense[]> {
   await settleAutoPay();
   const byScope: Filter<ExpenseDoc> =
-    opts.scope === "shared" ? { scope: "shared" } : opts.scope === "personal" ? { scope: "personal", owner: viewer } : visibleTo(viewer);
+    opts.scope === "shared"
+      ? { scope: "shared" }
+      : opts.scope === "personal"
+        ? { scope: "personal", owner: viewer }
+        : opts.scope === "ledger"
+          ? { $or: [{ scope: "shared" }, personalDebt] }
+          : visibleTo(viewer);
   const range = opts.month ? monthRange(opts.month) : null;
   const filter: Filter<ExpenseDoc> = range ? { ...byScope, date: { $gte: range.start, $lt: range.end } } : byScope;
   const docs = await (await expenses()).find(filter).sort({ date: -1, createdAt: -1 }).limit(1000).toArray();
@@ -206,7 +221,7 @@ export interface BalanceView {
 export async function getBalance(): Promise<BalanceView> {
   await settleAutoPay();
   const shared = await (await expenses())
-    .find({ scope: "shared" }, { projection: { amountCents: 1, scope: 1, paidBy: 1, createdAt: 1 } })
+    .find({ $or: [{ scope: "shared" }, personalDebt] }, { projection: { amountCents: 1, scope: 1, paidBy: 1, owner: 1, createdAt: 1 } })
     .toArray();
   const all = await (await settlements()).find().sort({ createdAt: -1 }).toArray();
   const { balanceCents } = computeBalance(shared, all);

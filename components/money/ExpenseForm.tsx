@@ -6,10 +6,14 @@ import { useSession } from "@/components/Providers";
 import { useMoneyActions, type Expense } from "@/lib/client/money";
 import { dayInParis, isDay } from "@/lib/domain/dates";
 import { centsToInput, describeExpense, parseAmount, type Payer, type Scope } from "@/lib/domain/money";
+import { otherProfile } from "@/lib/domain/profile";
 import { CategoryPicker } from "./CategoryPicker";
 import { Segmented } from "./Segmented";
 
 const LABEL_MAX = 60;
+
+/** « Pour » : les deux, juste moi, ou juste l'autre. */
+type For = Scope | "other";
 
 // Formulaire « Nouvelle dépense », aussi utilisé pour modifier (section 5.1).
 export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expense?: Expense; defaultScope?: Scope; onDone: () => void }) {
@@ -20,7 +24,10 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
   const [amount, setAmount] = useState(expense ? centsToInput(expense.amountCents) : "");
   const [label, setLabel] = useState(expense?.label ?? "");
   const [categoryId, setCategoryId] = useState<string | null>(expense?.categoryId ?? null);
-  const [scope, setScope] = useState<Scope>(expense?.scope ?? defaultScope);
+  const other = otherProfile(me);
+  const [pour, setPour] = useState<For>(expense ? (expense.scope === "personal" && expense.owner === other ? "other" : expense.scope) : defaultScope);
+  const scope: Scope = pour === "shared" ? "shared" : "personal";
+  const owner = pour === "shared" ? undefined : pour === "other" ? other : me;
   const [paidBy, setPaidBy] = useState<Payer>(expense?.paidBy ?? me);
   const [day, setDay] = useState(expense?.date ?? dayInParis());
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +35,8 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
 
   const amountCents = parseAmount(amount);
   const fromBill = expense?.source === "bill";
+  // Une facture perso est toujours payée par son propriétaire.
+  const askPayer = !(fromBill && scope === "personal");
 
   const submit = () => {
     if (!amountCents) return setError("Montant invalide : un nombre positif, 2 décimales au plus, 99 999,99 € maximum.");
@@ -38,7 +47,7 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
     saveExpense.mutate(
       {
         id: expense?.id,
-        input: { amountCents, label: label.trim(), categoryId, scope, paidBy: scope === "personal" ? me : paidBy, date: day, source: expense?.source === "ticket" ? "ticket" : undefined },
+        input: { amountCents, label: label.trim(), categoryId, scope, owner, paidBy: askPayer ? paidBy : (owner ?? me), date: day, source: expense?.source === "ticket" ? "ticket" : undefined },
       },
       { onSuccess: onDone, onError: () => setError("Impossible d’enregistrer. Vérifie le réseau.") },
     );
@@ -82,17 +91,18 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
             <Segmented
               label="Pour"
               tone="tl"
-              value={scope}
-              onChange={setScope}
+              value={pour}
+              onChange={setPour}
               options={[
                 { value: "shared", label: "Tous les deux" },
                 { value: "personal", label: "Juste moi" },
+                { value: "other", label: other === "jaz" ? "Juste elle" : "Juste lui" },
               ]}
             />
           </div>
         )}
 
-        {scope === "shared" && (
+        {askPayer && (
           <div className="field">
             <span>Payé par</span>
             <Segmented<Payer>
@@ -103,7 +113,7 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
                 { value: "lionel", label: "Lionel" },
                 { value: "jaz", label: "Jaz" },
                 // « Les deux » (chacun sa part) n'existe que pour une facture commune.
-                ...(fromBill ? [{ value: "both" as const, label: "Les deux" }] : []),
+                ...(fromBill && scope === "shared" ? [{ value: "both" as const, label: "Les deux" }] : []),
               ]}
             />
           </div>
@@ -115,7 +125,7 @@ export function ExpenseForm({ expense, defaultScope = "shared", onDone }: { expe
         </div>
 
         <p className="calc">
-          {describeExpense({ amountCents, scope, paidBy }).map((line, i) => (
+          {describeExpense({ amountCents, scope, paidBy, owner }, me).map((line, i) => (
             <span key={i}>
               {i > 0 && <br />}
               {line}

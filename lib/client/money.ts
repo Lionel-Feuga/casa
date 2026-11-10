@@ -22,13 +22,13 @@ export function useBalance() {
 
 export type LedgerEntry = { kind: "expense"; expense: Expense } | { kind: "settlement"; settlement: Settlement };
 
-/** Dépenses communes et règlements d'un mois, du plus récent au plus ancien (écran Comptes). */
+/** Dépenses communes (et perso payées par l'autre) et règlements d'un mois, du plus récent au plus ancien (écran Comptes). */
 export function useLedger(month: Month) {
   return useQuery({
     queryKey: ["expenses", "ledger", month],
     queryFn: async (): Promise<LedgerEntry[]> => {
       const [e, s] = await Promise.all([
-        api<{ expenses: Expense[] }>(`/expenses?month=${month}&scope=shared`),
+        api<{ expenses: Expense[] }>(`/expenses?month=${month}&scope=ledger`),
         api<{ settlements: Settlement[] }>(`/settlements?month=${month}`),
       ]);
       const entries: (LedgerEntry & { sortKey: string })[] = [
