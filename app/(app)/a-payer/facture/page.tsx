@@ -4,12 +4,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { Icon } from "@/components/Icon";
+import { useSession } from "@/components/Providers";
 import { CategoryPicker } from "@/components/money/CategoryPicker";
 import { Segmented } from "@/components/money/Segmented";
 import { useBill, useBillActions, type Bill } from "@/lib/client/bills";
 import { useCategories } from "@/lib/client/money";
 import { dayInParis, isDay } from "@/lib/domain/dates";
-import { centsToInput, parseAmount, type Payer } from "@/lib/domain/money";
+import { centsToInput, describeExpense, parseAmount, type Payer } from "@/lib/domain/money";
 
 type Freq = "month" | "year" | "once";
 
@@ -24,7 +25,8 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
   const [freq, setFreq] = useState<Freq>(bill ? (bill.kind === "once" ? "once" : (bill.every ?? "month")) : "month");
   const [scope, setScope] = useState<"shared" | "personal">(bill?.scope ?? "shared");
   const [autoPay, setAutoPay] = useState<"auto" | "manual">(bill?.autoPay ? "auto" : "manual");
-  const [autoPaidBy, setAutoPaidBy] = useState<Payer>(bill?.autoPaidBy ?? "both");
+  const { profile } = useSession();
+  const [autoPaidBy, setAutoPaidBy] = useState<Payer>(bill?.autoPaidBy ?? profile ?? "lionel");
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -131,18 +133,29 @@ function BillForm({ bill, onDone }: { bill?: Bill; onDone: () => void }) {
         </div>
         {autoPay === "auto" && scope === "shared" && (
           <div className="field">
-            <span>Prélevé sur le compte de</span>
+            <span>Payé par</span>
             <Segmented<Payer>
-              label="Prélevé sur le compte de"
+              label="Payé par"
               value={autoPaidBy}
               onChange={setAutoPaidBy}
               options={[
                 { value: "lionel", label: "Lionel" },
                 { value: "jaz", label: "Jaz" },
-                { value: "both", label: "Les deux" },
+                { value: "both", label: "Chacun sa part" },
               ]}
             />
           </div>
+        )}
+        {autoPay === "auto" && scope === "shared" && (
+          // Qui avance le prélèvement : l'autre lui doit sa part dans les Comptes, à chaque échéance.
+          <p className="calc">
+            {describeExpense({ amountCents: parseAmount(amount), scope: "shared", paidBy: autoPaidBy }).map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {i === 1 && autoPaidBy !== "both" ? `À chaque prélèvement, ${line}` : line}
+              </span>
+            ))}
+          </p>
         )}
         {autoPay === "auto" && (
           <p className="calc">
