@@ -74,8 +74,6 @@ export function useMoneyActions() {
 
   const settleExpense = useMutation({ mutationFn: (id: string) => api(`/expenses/${id}/settle`, { method: "POST" }), onSuccess: refresh });
 
-  const waiveDebt = useMutation({ mutationFn: (id: string) => api(`/expenses/${id}/waive`, { method: "POST" }), onSuccess: refresh });
-
   const deleteSettlement = useMutation({
     mutationFn: (id: string) => api(`/settlements/${id}`, { method: "DELETE" }),
     onSuccess: refresh,
@@ -98,5 +96,5 @@ export function useMoneyActions() {
     },
   });
 
-  return { saveExpense, deleteExpense, settle, settleExpense, waiveDebt, deleteSettlement, createCategory, deleteCategory };
+  return { saveExpense, deleteExpense, settle, settleExpense, deleteSettlement, createCategory, deleteCategory };
 }

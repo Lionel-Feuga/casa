@@ -68,7 +68,6 @@ export interface Expense {
   source: ExpenseDoc["source"];
   billId?: string;
   auto?: boolean;
-  noDebt?: boolean;
   createdBy: Profile;
   createdAt: string;
 }
@@ -85,7 +84,6 @@ export const toExpense = (d: ExpenseDoc): Expense => ({
   source: d.source,
   billId: d.billId?.toHexString(),
   auto: d.auto,
-  noDebt: d.noDebt,
   createdBy: d.createdBy,
   createdAt: d.createdAt.toISOString(),
 });
@@ -249,7 +247,7 @@ export async function getBalance(): Promise<BalanceView> {
   const shared = await (await expenses())
     .find(
       { $or: [{ scope: "shared" }, personalDebt] },
-      { projection: { label: 1, date: 1, amountCents: 1, scope: 1, paidBy: 1, owner: 1, noDebt: 1, settlementId: 1, createdAt: 1 } },
+      { projection: { label: 1, date: 1, amountCents: 1, scope: 1, paidBy: 1, owner: 1, settlementId: 1, createdAt: 1 } },
     )
     .sort({ date: -1, createdAt: -1 })
     .toArray();
@@ -280,16 +278,6 @@ export async function settleExpense(id: string, by: Profile): Promise<Settlement
   await (await settlements()).insertOne(doc);
   await Promise.all([publishChange("settlements", by), publishChange("expenses", by)]);
   return toSettlement(doc);
-}
-
-/** « Retirer » sur une ligne des détails : la dépense reste dans les budgets, sans part due. */
-export async function waiveDebt(id: string, by: Profile): Promise<boolean> {
-  const res = await (await expenses()).updateOne(
-    { _id: new ObjectId(id), ...visibleTo(by), settlementId: { $exists: false } },
-    { $set: { noDebt: true } },
-  );
-  if (res.modifiedCount) await publishChange("expenses", by);
-  return res.modifiedCount > 0;
 }
 
 export async function listSettlements(month: Month): Promise<Settlement[]> {

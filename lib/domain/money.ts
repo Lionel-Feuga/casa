@@ -43,8 +43,6 @@ export interface DebtSource {
   paidBy: Payer;
   /** Pour une dépense perso : celui ou celle pour qui elle est. */
   owner?: Profile;
-  /** Part due retirée à la main. */
-  noDebt?: boolean;
 }
 
 /**
@@ -53,7 +51,7 @@ export interface DebtSource {
  * est due en entier.
  */
 export function debtOf(e: DebtSource): { from: Profile; to: Profile; amountCents: number } | null {
-  if (e.paidBy === "both" || e.noDebt) return null;
+  if (e.paidBy === "both") return null;
   if (e.scope === "personal") {
     if (!e.owner || e.owner === e.paidBy) return null;
     return { from: e.owner, to: e.paidBy, amountCents: e.amountCents };

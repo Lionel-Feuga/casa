@@ -88,10 +88,3 @@ describe("Juste elle / Juste lui", () => {
     ]);
   });
 });
-
-describe("part due retirée", () => {
-  it("ne compte plus dans le solde", () => {
-    expect(debtOf({ amountCents: 1428, scope: "shared", paidBy: "lionel", noDebt: true })).toBeNull();
-    expect(debtOf({ amountCents: 1000, scope: "personal", paidBy: "lionel", owner: "jaz", noDebt: true })).toBeNull();
-  });
-});

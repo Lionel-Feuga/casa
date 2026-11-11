@@ -12,7 +12,7 @@ import { addMonths, currentMonth, monthLabel, shortDay, type Month } from "@/lib
 import { formatEuros, settlementFor, splitShares } from "@/lib/domain/money";
 import { PROFILE_LABEL } from "@/lib/domain/profile";
 
-function BalanceCard({ onSettle, onWaive }: { onSettle: () => void; onWaive: (d: OpenDebt) => void }) {
+function BalanceCard({ onSettle, onDelete }: { onSettle: () => void; onDelete: (d: OpenDebt) => void }) {
   const { data } = useBalance();
   const { settleExpense } = useMoneyActions();
   const [details, setDetails] = useState(false);
@@ -37,7 +37,7 @@ function BalanceCard({ onSettle, onWaive }: { onSettle: () => void; onWaive: (d:
         </p>
       )}
       {details && open.length > 0 && (
-        // Chaque part due ouverte : la rembourser seule, ou la retirer si l'autre avait déjà payé sa part.
+        // Chaque part due ouverte : la rembourser seule, ou supprimer la dépense saisie par erreur.
         <ul className="bdebts">
           {open.map((d) => (
             <li key={d.expenseId}>
@@ -50,8 +50,8 @@ function BalanceCard({ onSettle, onWaive }: { onSettle: () => void; onWaive: (d:
               <button type="button" className="pay" data-online-only disabled={settleExpense.isPending} onClick={() => settleExpense.mutate(d.expenseId)}>
                 Réglé
               </button>
-              <button type="button" className="pay ghost" data-online-only onClick={() => onWaive(d)}>
-                Retirer
+              <button type="button" className="pay ghost" data-online-only onClick={() => onDelete(d)}>
+                Supprimer
               </button>
             </li>
           ))}
@@ -107,9 +107,7 @@ function MonthEntries({ month, first, onSettlement }: { month: Month; first: boo
             const shares = splitShares(x.amountCents);
             // Dépense « Juste elle / Juste lui » payée par l'autre : due en entier.
             const forOne = x.scope === "personal" && x.owner ? x.owner : null;
-            const other = x.noDebt
-              ? "sans part due"
-              : forOne
+            const other = forOne
               ? `${PROFILE_LABEL[forOne]} doit tout`
               : x.paidBy === "lionel"
                 ? `part de Jaz ${formatEuros(shares.jaz)}`
@@ -148,14 +146,14 @@ export default function ComptesPage() {
   const [shown, setShown] = useState(1);
   const [confirmSettle, setConfirmSettle] = useState(false);
   const [cancelSettlement, setCancelSettlement] = useState<Settlement | null>(null);
-  const [waive, setWaive] = useState<OpenDebt | null>(null);
+  const [remove, setRemove] = useState<OpenDebt | null>(null);
   const { data: balance } = useBalance();
-  const { settle, deleteSettlement, waiveDebt } = useMoneyActions();
+  const { settle, deleteSettlement, deleteExpense } = useMoneyActions();
   const due = balance ? settlementFor(balance.balanceCents) : null;
 
   return (
     <Screen title="Comptes" left={<span className="meta">{monthLabel(month)}</span>}>
-      <BalanceCard onSettle={() => setConfirmSettle(true)} onWaive={setWaive} />
+      <BalanceCard onSettle={() => setConfirmSettle(true)} onDelete={setRemove} />
 
       <div className="split">
         <div className="sbar">
@@ -182,13 +180,13 @@ export default function ComptesPage() {
         />
       )}
 
-      {waive && (
+      {remove && (
         <ConfirmSheet
-          title="Retirer cette part due ?"
-          text={`${PROFILE_LABEL[waive.from]} ne devra plus ${formatEuros(waive.amountCents)} pour « ${waive.label} ». La dépense reste dans les budgets.`}
-          confirmLabel="Retirer"
-          onConfirm={() => waiveDebt.mutate(waive.expenseId)}
-          onClose={() => setWaive(null)}
+          title="Supprimer cette dépense ?"
+          text={`« ${remove.label} » est effacée : elle disparaît des Comptes et des Budgets, et ${PROFILE_LABEL[remove.from]} ne doit plus ${formatEuros(remove.amountCents)}.`}
+          confirmLabel="Supprimer"
+          onConfirm={() => deleteExpense.mutate(remove.expenseId)}
+          onClose={() => setRemove(null)}
         />
       )}
 

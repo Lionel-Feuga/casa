@@ -83,8 +83,6 @@ export interface ExpenseDoc {
   auto?: boolean;
   /** Part due remboursée à elle seule (« Réglé » dans les détails du solde). */
   settlementId?: ObjectId;
-  /** Part due retirée : la dépense reste dans les budgets mais ne compte plus dans les Comptes. */
-  noDebt?: boolean;
   createdBy: Profile;
   createdAt: Date;
   updatedAt: Date;
