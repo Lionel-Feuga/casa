@@ -496,3 +496,58 @@
   color: var(--ink);
   text-decoration: none;
 }
+.bcalc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bdet {
+  all: unset;
+  cursor: pointer;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  padding: 6px 0 6px 6px;
+}
+.bdet:focus-visible {
+  outline: 3px solid var(--bl);
+  outline-offset: 2px;
+}
+.bdebts {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--ink);
+}
+.bdebts li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1.5px dashed var(--ink);
+}
+.bdebts .et {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.bdebts .et b {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bdebts .et small {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+.pay.ghost {
+  background: transparent;
+  box-shadow: none;
+}

@@ -7,13 +7,16 @@ import { useState } from "react";
 import { CategoryIcon } from "@/components/CategoryIcon";
 import { ConfirmSheet } from "@/components/ConfirmSheet";
 import { Screen } from "@/components/Screen";
-import { useBalance, useCategories, useLedger, useMoneyActions, type LedgerEntry, type Settlement } from "@/lib/client/money";
+import { useBalance, useCategories, useLedger, useMoneyActions, type LedgerEntry, type OpenDebt, type Settlement } from "@/lib/client/money";
 import { addMonths, currentMonth, monthLabel, shortDay, type Month } from "@/lib/domain/dates";
 import { formatEuros, settlementFor, splitShares } from "@/lib/domain/money";
 import { PROFILE_LABEL } from "@/lib/domain/profile";
 
-function BalanceCard({ onSettle }: { onSettle: () => void }) {
+function BalanceCard({ onSettle, onWaive }: { onSettle: () => void; onWaive: (d: OpenDebt) => void }) {
   const { data } = useBalance();
+  const { settleExpense } = useMoneyActions();
+  const [details, setDetails] = useState(false);
+  const open = data?.open ?? [];
   const b = data?.balanceCents ?? 0;
   const who = b > 0 ? "Jaz doit à Lionel" : b < 0 ? "Lionel doit à Jaz" : "Vous êtes quittes";
   return (
@@ -23,8 +26,36 @@ function BalanceCard({ onSettle }: { onSettle: () => void }) {
       <p className="bwho">{data ? who : " "}</p>
       {data && (data.dueByJaz > 0 || data.dueByLionel > 0) && (
         <p className="bcalc">
-          {formatEuros(data.dueByJaz)} dus par Jaz − {formatEuros(data.dueByLionel)} dus par Lionel
+          <span>
+            {formatEuros(data.dueByJaz)} dus par Jaz − {formatEuros(data.dueByLionel)} dus par Lionel
+          </span>
+          {open.length > 0 && (
+            <button type="button" className="bdet" aria-expanded={details} onClick={() => setDetails((v) => !v)}>
+              {details ? "Masquer" : "Détails"}
+            </button>
+          )}
         </p>
+      )}
+      {details && open.length > 0 && (
+        // Chaque part due ouverte : la rembourser seule, ou la retirer si l'autre avait déjà payé sa part.
+        <ul className="bdebts">
+          {open.map((d) => (
+            <li key={d.expenseId}>
+              <span className="et">
+                <b>{d.label}</b>
+                <small>
+                  {shortDay(d.date)} · {PROFILE_LABEL[d.from]} doit {formatEuros(d.amountCents)}
+                </small>
+              </span>
+              <button type="button" className="pay" data-online-only disabled={settleExpense.isPending} onClick={() => settleExpense.mutate(d.expenseId)}>
+                Réglé
+              </button>
+              <button type="button" className="pay ghost" data-online-only onClick={() => onWaive(d)}>
+                Retirer
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
       <div className="bact">
         <button type="button" className="btn y" data-online-only onClick={onSettle} disabled={!data || b === 0}>
@@ -64,7 +95,9 @@ function MonthEntries({ month, first, onSettlement }: { month: Month; first: boo
                       <b>
                         {PROFILE_LABEL[s.from]} a remboursé {formatEuros(s.amountCents)} à {PROFILE_LABEL[s.to]}
                       </b>
-                      <small>Règlement · {shortDay(s.date)}</small>
+                      <small>
+                        Règlement{s.label ? ` · ${s.label}` : ""} · {shortDay(s.date)}
+                      </small>
                     </span>
                   </button>
                 </li>
@@ -74,7 +107,9 @@ function MonthEntries({ month, first, onSettlement }: { month: Month; first: boo
             const shares = splitShares(x.amountCents);
             // Dépense « Juste elle / Juste lui » payée par l'autre : due en entier.
             const forOne = x.scope === "personal" && x.owner ? x.owner : null;
-            const other = forOne
+            const other = x.noDebt
+              ? "sans part due"
+              : forOne
               ? `${PROFILE_LABEL[forOne]} doit tout`
               : x.paidBy === "lionel"
                 ? `part de Jaz ${formatEuros(shares.jaz)}`
@@ -113,13 +148,14 @@ export default function ComptesPage() {
   const [shown, setShown] = useState(1);
   const [confirmSettle, setConfirmSettle] = useState(false);
   const [cancelSettlement, setCancelSettlement] = useState<Settlement | null>(null);
+  const [waive, setWaive] = useState<OpenDebt | null>(null);
   const { data: balance } = useBalance();
-  const { settle, deleteSettlement } = useMoneyActions();
+  const { settle, deleteSettlement, waiveDebt } = useMoneyActions();
   const due = balance ? settlementFor(balance.balanceCents) : null;
 
   return (
     <Screen title="Comptes" left={<span className="meta">{monthLabel(month)}</span>}>
-      <BalanceCard onSettle={() => setConfirmSettle(true)} />
+      <BalanceCard onSettle={() => setConfirmSettle(true)} onWaive={setWaive} />
 
       <div className="split">
         <div className="sbar">
@@ -143,6 +179,16 @@ export default function ComptesPage() {
           confirmLabel="Régler"
           onConfirm={() => settle.mutate()}
           onClose={() => setConfirmSettle(false)}
+        />
+      )}
+
+      {waive && (
+        <ConfirmSheet
+          title="Retirer cette part due ?"
+          text={`${PROFILE_LABEL[waive.from]} ne devra plus ${formatEuros(waive.amountCents)} pour « ${waive.label} ». La dépense reste dans les budgets.`}
+          confirmLabel="Retirer"
+          onConfirm={() => waiveDebt.mutate(waive.expenseId)}
+          onClose={() => setWaive(null)}
         />
       )}
 

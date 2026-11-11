@@ -3,10 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Category } from "@/lib/domain/categories";
 import type { Month } from "@/lib/domain/dates";
-import type { BalanceView, Expense, ExpenseInput, Settlement } from "@/lib/money/server";
+import type { BalanceView, Expense, ExpenseInput, OpenDebt, Settlement } from "@/lib/money/server";
 import { api } from "./api";
 
-export type { BalanceView, Expense, ExpenseInput, Settlement };
+export type { BalanceView, Expense, ExpenseInput, OpenDebt, Settlement };
 
 export function useCategories() {
   return useQuery({
@@ -72,6 +72,10 @@ export function useMoneyActions() {
 
   const settle = useMutation({ mutationFn: () => api("/settlements", { method: "POST" }), onSuccess: refresh });
 
+  const settleExpense = useMutation({ mutationFn: (id: string) => api(`/expenses/${id}/settle`, { method: "POST" }), onSuccess: refresh });
+
+  const waiveDebt = useMutation({ mutationFn: (id: string) => api(`/expenses/${id}/waive`, { method: "POST" }), onSuccess: refresh });
+
   const deleteSettlement = useMutation({
     mutationFn: (id: string) => api(`/settlements/${id}`, { method: "DELETE" }),
     onSuccess: refresh,
@@ -94,5 +98,5 @@ export function useMoneyActions() {
     },
   });
 
-  return { saveExpense, deleteExpense, settle, deleteSettlement, createCategory, deleteCategory };
+  return { saveExpense, deleteExpense, settle, settleExpense, waiveDebt, deleteSettlement, createCategory, deleteCategory };
 }

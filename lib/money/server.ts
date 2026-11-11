@@ -4,7 +4,7 @@ import { getDb } from "@/lib/db/mongo";
 import { cleanName } from "@/lib/domain/shopping";
 import { FALLBACK_CATEGORY_KEY, sortCategories, type Category } from "@/lib/domain/categories";
 import { dateToDay, dayInParis, dayToDate, monthRange, type Day, type Month } from "@/lib/domain/dates";
-import { computeBalance, settlementFor, type Payer, type Scope } from "@/lib/domain/money";
+import { computeBalance, debtOf, settlementFor, type Payer, type Scope } from "@/lib/domain/money";
 import { normalizeName } from "@/lib/domain/normalize";
 import type { Profile } from "@/lib/domain/profile";
 import { settleAutoPay } from "@/lib/bills/autopay";
@@ -68,6 +68,7 @@ export interface Expense {
   source: ExpenseDoc["source"];
   billId?: string;
   auto?: boolean;
+  noDebt?: boolean;
   createdBy: Profile;
   createdAt: string;
 }
@@ -84,6 +85,7 @@ export const toExpense = (d: ExpenseDoc): Expense => ({
   source: d.source,
   billId: d.billId?.toHexString(),
   auto: d.auto,
+  noDebt: d.noDebt,
   createdBy: d.createdBy,
   createdAt: d.createdAt.toISOString(),
 });
@@ -164,6 +166,15 @@ export async function updateExpense(id: string, input: ExpenseInput, by: Profile
     { returnDocument: "after" },
   );
   if (!doc) return null;
+  // Déjà remboursée à elle seule : le règlement suit le nouveau montant, ou disparaît s'il n'y a plus de part due.
+  if (doc.settlementId) {
+    const d = debtOf(doc);
+    if (d) await (await settlements()).updateOne({ _id: doc.settlementId }, { $set: { ...d, label: doc.label } });
+    else {
+      await (await settlements()).deleteOne({ _id: doc.settlementId });
+      await (await expenses()).updateOne({ _id: doc._id }, { $unset: { settlementId: "" } });
+    }
+  }
   await publishChange("expenses", by);
   return toExpense(doc);
 }
@@ -172,6 +183,7 @@ export async function deleteExpense(id: string, by: Profile): Promise<boolean> {
   const doc = await (await expenses()).findOneAndDelete({ _id: new ObjectId(id), ...visibleTo(by) });
   if (!doc) return false;
   await restoreBill(doc, by);
+  if (doc.settlementId) await (await settlements()).deleteOne({ _id: doc.settlementId });
   await publishChange("expenses", by);
   return true;
 }
@@ -199,6 +211,8 @@ export interface Settlement {
   to: Profile;
   amountCents: number;
   date: Day;
+  /** Libellé de la dépense, pour le règlement d'une seule part due. */
+  label?: string;
   createdAt: string;
 }
 
@@ -208,26 +222,74 @@ const toSettlement = (d: SettlementDoc): Settlement => ({
   to: d.to,
   amountCents: d.amountCents,
   date: dateToDay(d.date),
+  label: d.label,
   createdAt: d.createdAt.toISOString(),
 });
 
+/** Part due encore ouverte : ni remboursée à elle seule, ni couverte par un « Régler » du solde entier. */
+export interface OpenDebt {
+  expenseId: string;
+  label: string;
+  date: Day;
+  from: Profile;
+  to: Profile;
+  amountCents: number;
+}
+
 export interface BalanceView {
   balanceCents: number;
-  /** Détail depuis le dernier règlement. */
+  /** Détail depuis le dernier « Régler » du solde entier. */
   dueByJaz: number;
   dueByLionel: number;
+  open: OpenDebt[];
 }
 
 export async function getBalance(): Promise<BalanceView> {
   await settleAutoPay();
   const shared = await (await expenses())
-    .find({ $or: [{ scope: "shared" }, personalDebt] }, { projection: { amountCents: 1, scope: 1, paidBy: 1, owner: 1, createdAt: 1 } })
+    .find(
+      { $or: [{ scope: "shared" }, personalDebt] },
+      { projection: { label: 1, date: 1, amountCents: 1, scope: 1, paidBy: 1, owner: 1, noDebt: 1, settlementId: 1, createdAt: 1 } },
+    )
+    .sort({ date: -1, createdAt: -1 })
     .toArray();
   const all = await (await settlements()).find().sort({ createdAt: -1 }).toArray();
   const { balanceCents } = computeBalance(shared, all);
-  const last = all[0]?.createdAt;
-  const since = computeBalance(last ? shared.filter((e) => e.createdAt > last) : shared, []);
-  return { balanceCents, dueByJaz: since.dueByJaz, dueByLionel: since.dueByLionel };
+  const last = all.find((s) => !s.expenseId)?.createdAt;
+  const open: OpenDebt[] = [];
+  for (const e of shared) {
+    if (e.settlementId || (last && e.createdAt <= last)) continue;
+    const d = debtOf(e);
+    if (d) open.push({ expenseId: e._id.toHexString(), label: e.label, date: dateToDay(e.date), ...d });
+  }
+  const sum = (from: Profile) => open.filter((d) => d.from === from).reduce((s, d) => s + d.amountCents, 0);
+  return { balanceCents, dueByJaz: sum("jaz"), dueByLionel: sum("lionel"), open };
+}
+
+/** « Réglé » sur une ligne des détails : rembourse cette part due seule, à la date du jour. */
+export async function settleExpense(id: string, by: Profile): Promise<Settlement | null> {
+  const col = await expenses();
+  const e = await col.findOne({ _id: new ObjectId(id), ...visibleTo(by), settlementId: { $exists: false } });
+  const d = e && debtOf(e);
+  if (!e || !d) return null;
+  const now = new Date();
+  const doc: SettlementDoc = { _id: new ObjectId(), ...d, date: dayToDate(dayInParis(now)), expenseId: e._id, label: e.label, createdBy: by, createdAt: now };
+  // Deux appuis en même temps ne remboursent pas deux fois.
+  const res = await col.updateOne({ _id: e._id, settlementId: { $exists: false } }, { $set: { settlementId: doc._id } });
+  if (!res.modifiedCount) return null;
+  await (await settlements()).insertOne(doc);
+  await Promise.all([publishChange("settlements", by), publishChange("expenses", by)]);
+  return toSettlement(doc);
+}
+
+/** « Retirer » sur une ligne des détails : la dépense reste dans les budgets, sans part due. */
+export async function waiveDebt(id: string, by: Profile): Promise<boolean> {
+  const res = await (await expenses()).updateOne(
+    { _id: new ObjectId(id), ...visibleTo(by), settlementId: { $exists: false } },
+    { $set: { noDebt: true } },
+  );
+  if (res.modifiedCount) await publishChange("expenses", by);
+  return res.modifiedCount > 0;
 }
 
 export async function listSettlements(month: Month): Promise<Settlement[]> {
@@ -248,7 +310,10 @@ export async function settle(by: Profile): Promise<Settlement | null> {
 }
 
 export async function deleteSettlement(id: string, by: Profile): Promise<boolean> {
-  const res = await (await settlements()).deleteOne({ _id: new ObjectId(id) });
-  if (res.deletedCount) await publishChange("settlements", by);
-  return res.deletedCount > 0;
+  const doc = await (await settlements()).findOneAndDelete({ _id: new ObjectId(id) });
+  if (!doc) return false;
+  // Annuler le règlement d'une seule dépense rouvre sa part due.
+  if (doc.expenseId) await (await expenses()).updateOne({ _id: doc.expenseId }, { $unset: { settlementId: "" } });
+  await publishChange("settlements", by);
+  return true;
 }

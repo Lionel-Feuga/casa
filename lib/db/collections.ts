@@ -81,6 +81,10 @@ export interface ExpenseDoc {
   billNextDueDate?: Date;
   /** Créée par un prélèvement automatique. */
   auto?: boolean;
+  /** Part due remboursée à elle seule (« Réglé » dans les détails du solde). */
+  settlementId?: ObjectId;
+  /** Part due retirée : la dépense reste dans les budgets mais ne compte plus dans les Comptes. */
+  noDebt?: boolean;
   createdBy: Profile;
   createdAt: Date;
   updatedAt: Date;
@@ -92,6 +96,9 @@ export interface SettlementDoc {
   to: Profile;
   amountCents: number;
   date: Date;
+  /** Règlement d'une seule dépense ; absent pour « Régler » tout le solde. */
+  expenseId?: ObjectId;
+  label?: string;
   createdBy: Profile;
   createdAt: Date;
 }
