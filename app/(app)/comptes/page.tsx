@@ -48,7 +48,7 @@ function BalanceCard({ onSettle, onDelete }: { onSettle: () => void; onDelete: (
                 </small>
               </span>
               <button type="button" className="pay" data-online-only disabled={settleExpense.isPending} onClick={() => settleExpense.mutate(d.expenseId)}>
-                Réglé
+                Régler
               </button>
               <button type="button" className="pay ghost" data-online-only onClick={() => onDelete(d)}>
                 Annuler
