@@ -6,7 +6,7 @@ import { Sheet } from "@/components/Sheet";
 import { useCategories, useMoneyActions } from "@/lib/client/money";
 import { dayInParis } from "@/lib/domain/dates";
 import { parseAmount, type Scope } from "@/lib/domain/money";
-import type { Profile } from "@/lib/domain/profile";
+import { otherProfile, type Profile } from "@/lib/domain/profile";
 import { CategoryPicker } from "./CategoryPicker";
 import { Segmented } from "./Segmented";
 
@@ -18,7 +18,11 @@ export function TicketSheet({ onClose }: { onClose: () => void }) {
   const { saveExpense } = useMoneyActions();
   const [amount, setAmount] = useState("");
   const [paidBy, setPaidBy] = useState<Profile>(me);
-  const [scope, setScope] = useState<Scope>("shared");
+  const other = otherProfile(me);
+  // « Pour » : les deux, juste moi, ou juste l'autre (comme « + Dépense »).
+  const [pour, setPour] = useState<Scope | "other">("shared");
+  const scope: Scope = pour === "shared" ? "shared" : "personal";
+  const owner = pour === "shared" ? undefined : pour === "other" ? other : me;
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +36,7 @@ export function TicketSheet({ onClose }: { onClose: () => void }) {
     if (!amountCents) return setError("Indique le montant du ticket.");
     if (!categoryId) return setError("Choisis une catégorie.");
     saveExpense.mutate(
-      { input: { label: "Ticket de courses", amountCents, categoryId, scope, paidBy: scope === "personal" ? me : paidBy, date: dayInParis(), source: "ticket" } },
+      { input: { label: "Ticket de courses", amountCents, categoryId, scope, owner, paidBy, date: dayInParis(), source: "ticket" } },
       { onSuccess: onClose, onError: () => setError("Impossible d’enregistrer. Vérifie le réseau.") },
     );
   };
@@ -56,28 +60,27 @@ export function TicketSheet({ onClose }: { onClose: () => void }) {
         <Segmented
           label="Pour"
           tone="tl"
-          value={scope}
-          onChange={setScope}
+          value={pour}
+          onChange={setPour}
           options={[
             { value: "shared", label: "Tous les deux" },
             { value: "personal", label: "Juste moi" },
+            { value: "other", label: other === "jaz" ? "Juste elle" : "Juste lui" },
           ]}
         />
       </div>
-      {scope === "shared" && (
-        <div className="field">
-          <span>Payé par</span>
-          <Segmented
-            label="Payé par"
-            value={paidBy}
-            onChange={setPaidBy}
-            options={[
-              { value: "lionel", label: "Lionel" },
-              { value: "jaz", label: "Jaz" },
-            ]}
-          />
-        </div>
-      )}
+      <div className="field">
+        <span>Payé par</span>
+        <Segmented
+          label="Payé par"
+          value={paidBy}
+          onChange={setPaidBy}
+          options={[
+            { value: "lionel", label: "Lionel" },
+            { value: "jaz", label: "Jaz" },
+          ]}
+        />
+      </div>
       <div className="field">
         <span>Catégorie</span>
         <CategoryPicker value={categoryId} onChange={setCategoryId} />
