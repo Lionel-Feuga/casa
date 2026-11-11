@@ -51,7 +51,7 @@ function BalanceCard({ onSettle, onDelete }: { onSettle: () => void; onDelete: (
                 Réglé
               </button>
               <button type="button" className="pay ghost" data-online-only onClick={() => onDelete(d)}>
-                Supprimer
+                Annuler
               </button>
             </li>
           ))}
@@ -182,9 +182,10 @@ export default function ComptesPage() {
 
       {remove && (
         <ConfirmSheet
-          title="Supprimer cette dépense ?"
+          title="Annuler cette dépense ?"
           text={`« ${remove.label} » est effacée : elle disparaît des Comptes et des Budgets, et ${PROFILE_LABEL[remove.from]} ne doit plus ${formatEuros(remove.amountCents)}.`}
-          confirmLabel="Supprimer"
+          confirmLabel="Annuler la dépense"
+          cancelLabel="Garder"
           onConfirm={() => deleteExpense.mutate(remove.expenseId)}
           onClose={() => setRemove(null)}
         />
